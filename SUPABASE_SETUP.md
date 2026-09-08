@@ -266,13 +266,18 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 
 1. **Authentication** → **URL Configuration**
 2. **Site URL**: `http://localhost:3200`
-3. **Redirect URLs** → **Add URL**: `http://localhost:3200/auth/callback`
+3. **Redirect URLs** → **Add URL** 로 **두 개** 등록
+   - `http://localhost:3200/auth/confirm`
+   - `http://localhost:3200/auth/callback`
 4. **Save**
+
+> 두 경로를 모두 등록하는 이유는 §4.6 참고. `confirm` 이 이메일 링크용,
+> `callback` 은 나중에 붙일 소셜 로그인용이다.
 
 배포 후 추가할 것:
 
 - Site URL 을 `https://<도메인>` 으로 변경
-- Redirect URLs 에 `https://<도메인>/auth/callback` 추가
+- Redirect URLs 에 `https://<도메인>/auth/confirm` 과 `.../auth/callback` 추가
 - `.env.local` (또는 Vercel 환경변수) 의 `NEXT_PUBLIC_SITE_URL` 도 같이 변경
 
 > Supabase 는 와일드카드(`**`)를 허용하지만 **쓰지 않는다.** 정확한 경로만
@@ -301,6 +306,80 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 
 > CAPTCHA 를 켜면 클라이언트가 토큰을 함께 보내야 하므로 **코드 수정이 따른다.**
 > 켜자마자 가입이 막히므로, 실사용 오픈 직전에 코드 작업과 함께 진행한다.
+
+### 4.6 이메일 템플릿 변경 (필수) — 링크가 `error=auth_callback` 으로 튈 때
+
+**증상** — 메일은 오지만, 인증 버튼이나 재설정 버튼을 누르면
+`/login?error=auth_callback` 으로 이동한다.
+
+**원인** — Supabase 기본 템플릿의 `{{ .ConfirmationURL }}` 은
+`<supabase>/auth/v1/verify?token=...` 를 거쳐 앱으로 돌아온다. 이때 세션
+정보가 **URL 프래그먼트(`#access_token=...`)** 로 오거나, `?code=` 로 오더라도
+**발급 시점에 심어둔 쿠키(code verifier)** 가 있어야 교환된다.
+
+- 프래그먼트는 서버가 볼 수 없다 (브라우저가 서버로 보내지 않는다)
+- 쿠키 방식은 메일을 다른 브라우저·기기에서 열면 실패한다
+
+**해결** — 템플릿을 `{{ .TokenHash }}` 형태로 바꾼다. 이 방식은 쿠키에
+의존하지 않아서 어느 브라우저에서 열어도 동작한다. 서버 사이드 인증에서
+권장되는 방식이다.
+
+**Authentication** → **Emails** (또는 Email Templates) 에서 두 개를 고친다.
+
+#### ① Confirm signup (가입 인증)
+
+본문에서 `{{ .ConfirmationURL }}` 을 찾아 아래로 **그대로** 교체한다.
+
+```
+{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email
+```
+
+예를 들어 기본 본문이 이렇다면:
+
+```html
+<p><a href="{{ .ConfirmationURL }}">Confirm your mail</a></p>
+```
+
+이렇게 바꾼다:
+
+```html
+<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">이메일 인증하기</a></p>
+```
+
+#### ② Reset password (비밀번호 재설정)
+
+`type` 만 다르다. `recovery` 로 둔다.
+
+```
+{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery
+```
+
+```html
+<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery">비밀번호 재설정하기</a></p>
+```
+
+> `next` 파라미터를 붙이지 않아도 된다. 앱이 `type=recovery` 를 보고
+> 비밀번호 설정 화면(`/settings?reset=1`)으로 보낸다.
+
+#### 확인
+
+1. 템플릿 저장 후 `/signup` 에서 **새 이메일로** 다시 가입한다
+   (이미 보낸 메일의 링크는 옛 템플릿이라 그대로 실패한다)
+2. 메일의 링크 주소가 `.../auth/confirm?token_hash=...&type=email` 형태인지 확인
+3. 링크를 누르면 홈으로 이동하고 헤더에 닉네임이 보인다
+
+**여전히 `error=auth_callback` 이 뜨면** 주소창의 `reason` 값을 보면 원인이 나온다.
+
+| reason | 뜻 |
+|---|---|
+| `no_token` | 링크에 `token_hash` 가 없다 → 템플릿이 아직 안 바뀌었다 |
+| `verify_failed` | 링크 만료 또는 이미 사용됨 → 메일을 다시 받는다 |
+| `bad_type` | `type` 값이 잘못됐다 → 템플릿의 `type=` 확인 |
+| `exchange_failed` | 다른 브라우저에서 링크를 열었다 → 템플릿 변경으로 해결됨 |
+| `upstream` | Supabase 가 요청을 거부 → 잠시 후 재시도 |
+| `not_configured` | `.env.local` 미설정 |
+
+화면에도 같은 안내가 사람 말로 표시되고 &lsquo;메일 다시 받기&rsquo; 링크가 함께 나온다.
 
 ---
 
@@ -402,7 +481,8 @@ npx supabase gen types typescript --project-id <프로젝트-ref> > src/types/da
 |---|---|
 | `데이터베이스 미연결` 이 안 사라진다 | 개발 서버 재시작 안 함 / 변수 이름 앞 `#` 안 지움 / `=` 뒤가 빈 값 |
 | 가입은 되는데 메일이 안 온다 | 스팸함 확인. 내장 메일러 시간당 한도 초과 (§4.4 로 해결) |
-| 메일 링크를 누르면 `인증 링크가 만료되었거나 올바르지 않습니다` | §4.3 Redirect URLs 에 `/auth/callback` 미등록, 또는 `NEXT_PUBLIC_SITE_URL` 과 Site URL 불일치 |
+| 메일 링크를 누르면 `error=auth_callback` 으로 튄다 | **대부분 §4.6 이메일 템플릿 미변경.** 주소창의 `reason` 값으로 원인을 구분한다 |
+| 메일 링크가 `reason=no_token` | §4.6 템플릿을 `{{ .TokenHash }}` 형태로 바꾸지 않았다 |
 | 글 작성 시 `권한이 없습니다` | 이메일 인증 미완료, 또는 공지 카테고리에 일반 계정으로 작성 시도 |
 | 로그인이 자꾸 풀린다 | `proxy.ts` 가 동작하지 않는 상태. 빌드 출력에 `ƒ Proxy (Middleware)` 가 있는지 확인 |
 | `Invalid API key` | Secret 키를 넣었거나 키 값이 잘린 상태. §3-② 로 다시 복사 |
@@ -414,6 +494,7 @@ npx supabase gen types typescript --project-id <프로젝트-ref> > src/types/da
 [TECH_SPEC.md §10](TECH_SPEC.md) 전체를 통과해야 한다. 특히 아직 안 된 것:
 
 - 커스텀 SMTP (§4.4)
+- 이메일 템플릿 한글화 — §4.6 의 링크 형태를 유지할 것
 - CAPTCHA + rate limit (§4.5) — **코드 수정 동반**
 - 유출 비밀번호 차단 (§4.2) — **Pro 플랜 필요**
 - 도배 방지 쿨다운

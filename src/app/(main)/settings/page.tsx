@@ -15,7 +15,11 @@ import { getViewer } from "@/lib/session";
 export const metadata = { title: "내 정보", robots: { index: false } };
 
 /** 프로필 설정 (F-106 / F-107) */
-export default async function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: PageProps<"/settings">) {
+  const { reset } = await searchParams;
+  const isPasswordReset = reset === "1";
   const viewer = await getViewer();
 
   // 시드 모드에서는 세션이 없다. 형상 확인을 막지 않도록
@@ -30,6 +34,17 @@ export default async function SettingsPage() {
   return (
     <div className="px-4 py-5 lg:px-0 lg:py-0">
       <h1 className="mb-4 text-title font-bold text-ink">내 정보</h1>
+
+      {isPasswordReset && viewer && (
+        <p
+          role="status"
+          className="mb-6 rounded-[var(--radius-sm)] bg-brand-soft px-4 py-3 text-meta leading-relaxed text-brand"
+        >
+          <b className="font-bold">본인 확인 완료</b> 아래 &lsquo;비밀번호&rsquo;
+          에서 새 비밀번호를 설정해 주세요. 설정하지 않으면 기존 비밀번호가
+          그대로 유지됩니다.
+        </p>
+      )}
 
       {!viewer ? (
         <>

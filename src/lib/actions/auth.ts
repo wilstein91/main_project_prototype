@@ -53,7 +53,7 @@ export async function signUpAction(
     options: {
       // handle_new_user 트리거가 이 값으로 profiles 행을 만든다
       data: { nickname },
-      emailRedirectTo: `${SITE_URL}/auth/callback`,
+      emailRedirectTo: `${SITE_URL}/auth/confirm`,
     },
   });
 
@@ -105,7 +105,7 @@ export async function requestPasswordResetAction(
 
   const supabase = await createClient();
   await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-    redirectTo: `${SITE_URL}/auth/callback?next=/settings`,
+    redirectTo: `${SITE_URL}/auth/confirm?next=/settings%3Freset%3D1`,
   });
 
   // 계정 존재 여부를 노출하지 않는다 — 성공·실패 모두 같은 응답 (TECH_SPEC §6).
