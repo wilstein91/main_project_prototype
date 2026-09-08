@@ -190,6 +190,11 @@ export interface Database {
         Args: { p_post_id: number };
         Returns: undefined;
       };
+      /** 글 소프트 삭제 (0005) — 권한 검사는 함수 안에서 한다 */
+      soft_delete_post: {
+        Args: { p_post_id: number };
+        Returns: undefined;
+      };
     };
     Enums: Record<never, never>;
     CompositeTypes: Record<never, never>;

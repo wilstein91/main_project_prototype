@@ -132,12 +132,20 @@ export async function deletePostAction(formData: FormData): Promise<void> {
 
   if (!post) return;
 
-  const { error } = await supabase
-    .from("posts")
-    .update({ is_deleted: true, updated_at: new Date().toISOString() })
-    .eq("id", postId);
+  const slug = (post as unknown as { category: { slug: string } }).category.slug;
 
-  if (error) return;
+  // UPDATE 가 아니라 함수로 지운다. 이유는 0005 마이그레이션 주석에 있다 —
+  // 요약하면 PostgREST 의 RETURNING 에 SELECT 정책이 걸려 회원 본인의
+  // 소프트 삭제가 42501 로 막혔다.
+  const { error } = await supabase.rpc("soft_delete_post", {
+    p_post_id: postId,
+  });
+
+  if (error) {
+    // 조용히 return 하면 버튼이 고장난 것과 구별되지 않는다. 실제로 이
+    // 버그를 몇 주 동안 못 본 이유가 여기 있었다.
+    redirect(`/c/${slug}/${postId}?error=delete`);
+  }
 
   const isOthers = post.author_id !== profile.id;
   if (profile.role === "admin" && isOthers) {
@@ -151,7 +159,6 @@ export async function deletePostAction(formData: FormData): Promise<void> {
     });
   }
 
-  const slug = (post as unknown as { category: { slug: string } }).category.slug;
   revalidatePath("/");
   revalidatePath(`/c/${slug}`);
   redirect(`/c/${slug}`);

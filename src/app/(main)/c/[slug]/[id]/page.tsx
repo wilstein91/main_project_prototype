@@ -28,8 +28,10 @@ export async function generateMetadata({
 /** 글 상세 (F-204) — 비회원도 본문까지 열람 (PRD §5) */
 export default async function PostDetailPage({
   params,
+  searchParams,
 }: PageProps<"/c/[slug]/[id]">) {
   const { slug, id } = await params;
+  const { error } = await searchParams;
   const postId = Number(id);
   if (!Number.isInteger(postId) || postId <= 0) notFound();
 
@@ -48,6 +50,15 @@ export default async function PostDetailPage({
     <article className="lg:rounded-[var(--radius-md)] lg:border lg:border-line lg:bg-canvas">
       {/* 조회수 (F-208) — 쿠키로 같은 방문자의 재조회를 걸러낸다 */}
       <ViewCounter postId={post.id} />
+
+      {error === "delete" && (
+        <p
+          role="alert"
+          className="border-b border-line bg-surface px-4 py-3 text-meta text-danger lg:px-5"
+        >
+          글을 삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.
+        </p>
+      )}
 
       <header className="border-b border-line px-4 py-5 lg:px-5">
         <div className="mb-2 flex items-center gap-2">

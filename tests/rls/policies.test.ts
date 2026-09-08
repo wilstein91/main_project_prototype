@@ -95,6 +95,28 @@ describe.skipIf(!hasConfig)("anon (비회원)", () => {
     const r = await rest.rpc<boolean>(ANON_TOKEN, "is_admin");
     expect(r.body).toBe(false);
   });
+
+  it("삭제 함수를 호출할 수 없다", async () => {
+    const target = await rest.select<{ id: number }[]>(
+      ANON_TOKEN,
+      "posts?select=id&is_deleted=eq.false&limit=1",
+    );
+    if (target.body.length === 0) return;
+    const id = target.body[0].id;
+
+    // soft_delete_post 는 SECURITY DEFINER 다. anon 에게 EXECUTE 가
+    // 새어 나가면 누구나 아무 글이나 지울 수 있다.
+    const r = await rest.rpc(ANON_TOKEN, "soft_delete_post", {
+      p_post_id: id,
+    });
+    expect(r.status).toBeGreaterThanOrEqual(400);
+
+    const after = await rest.select<{ is_deleted: boolean }[]>(
+      ANON_TOKEN,
+      `posts?select=is_deleted&id=eq.${id}`,
+    );
+    expect(after.body[0].is_deleted).toBe(false);
+  });
 });
 
 describe.skipIf(!hasMember)("일반 회원 (authenticated, role=user)", () => {
@@ -109,10 +131,28 @@ describe.skipIf(!hasMember)("일반 회원 (authenticated, role=user)", () => {
   });
 
   afterAll(async () => {
-    // 테스트가 남긴 글을 소프트 삭제해 목록을 어지럽히지 않는다
+    // 테스트가 남긴 글을 정리한다.
+    //
+    // 예전에는 posts 를 직접 PATCH 했다. 그 요청은 42501 로 **전부 실패**
+    // 했는데 반환값을 보지 않아서 조용히 넘어갔고, 운영 DB 목록에 테스트
+    // 글이 6건 쌓였다. 원인과 해법은 0005 마이그레이션 주석에 있다.
+    //
+    // 정리가 실패하면 이제 이 훅에서 깨진다. 정리는 테스트의 일부다.
+    if (created.length === 0) return;
+
     for (const id of created) {
-      await rest.patch(token, "posts", `id=eq.${id}`, { is_deleted: true });
+      const r = await rest.rpc(token, "soft_delete_post", { p_post_id: id });
+      // P0002 = 이미 삭제됨. 삭제 테스트가 먼저 지운 경우다.
+      if (r.status >= 400 && r.code !== "P0002") {
+        throw new Error(`정리 실패: post ${id} → HTTP ${r.status} ${r.code}`);
+      }
     }
+
+    const left = await rest.select<PostRow[]>(
+      token,
+      `posts?select=id&id=in.(${created.join(",")})`,
+    );
+    expect(left.body).toHaveLength(0);
   });
 
   it("관리자가 아니다", async () => {
@@ -193,6 +233,36 @@ describe.skipIf(!hasMember)("일반 회원 (authenticated, role=user)", () => {
     expect(after.body[0].title).toBe(target.title);
   });
 
+  /**
+   * 이 테스트가 없어서 삭제 버그가 오래 살아 있었다.
+   *
+   * '남의 글을 삭제할 수 없다' 는 통과하고 있었지만, 사실은 **본인 글까지
+   * 포함해 모든 삭제가 막혀 있었기** 때문에 통과한 거짓 통과였다.
+   * 막혀야 하는 것만 검사하면 이런 실패를 못 잡는다 — 통해야 하는 것도
+   * 같은 강도로 검사한다.
+   */
+  it("자기 글을 삭제할 수 있다 (F-206)", async () => {
+    const made = await rest.insert<PostRow[]>(token, "posts", {
+      category_id: FREE_CATEGORY,
+      author_id: userId,
+      title: "삭제 경로 테스트",
+      content: "이 글은 같은 테스트 안에서 지워진다",
+    });
+    expect(made.status).toBe(201);
+    const id = made.body[0].id;
+    created.push(id); // 삭제가 실패하면 afterAll 이 치운다
+
+    const r = await rest.rpc(token, "soft_delete_post", { p_post_id: id });
+    expect(r.status).toBeLessThan(300);
+
+    // 삭제된 글은 작성자 본인에게도 보이지 않는다 (posts_select 유지)
+    const after = await rest.select<PostRow[]>(
+      token,
+      `posts?select=id&id=eq.${id}`,
+    );
+    expect(after.body).toHaveLength(0);
+  });
+
   it("남의 글을 삭제할 수 없다", async () => {
     const others = await rest.select<PostRow[]>(
       token,
@@ -201,10 +271,17 @@ describe.skipIf(!hasMember)("일반 회원 (authenticated, role=user)", () => {
     if (others.body.length === 0) return;
 
     const id = others.body[0].id;
-    const r = await rest.patch<unknown[]>(token, "posts", `id=eq.${id}`, {
+
+    // 경로 1 — 테이블 직접 UPDATE
+    const direct = await rest.patch<unknown[]>(token, "posts", `id=eq.${id}`, {
       is_deleted: true,
     });
-    expect(affectedNoRows(r) || isRlsViolation(r)).toBe(true);
+    expect(affectedNoRows(direct) || isRlsViolation(direct)).toBe(true);
+
+    // 경로 2 — 삭제 함수. SECURITY DEFINER 라 RLS 를 우회하므로,
+    // 함수 안의 권한 검사가 유일한 방어선이다. 반드시 직접 확인한다.
+    const viaFn = await rest.rpc(token, "soft_delete_post", { p_post_id: id });
+    expect(viaFn.status).toBeGreaterThanOrEqual(400);
 
     const after = await rest.select<PostRow[]>(
       token,
