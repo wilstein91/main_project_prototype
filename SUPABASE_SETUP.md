@@ -17,6 +17,34 @@
 
 ---
 
+## 0. 자주 쓰는 화면 바로가기
+
+**"대시보드"** 는 SQL 을 붙여넣고 Run 했던 그 웹사이트다 (supabase.com).
+메뉴를 찾아 헤매지 말고 아래 주소를 브라우저에 붙여넣으면 바로 열린다.
+이 프로젝트(`suoaovdanimacisbocuk`) 전용 주소다.
+
+| 하려는 일 | 주소 |
+|---|---|
+| **SQL 실행** (스키마·계정·확인 쿼리) | `https://supabase.com/dashboard/project/suoaovdanimacisbocuk/sql/new` |
+| **회원 목록·수동 인증·계정 생성** | `https://supabase.com/dashboard/project/suoaovdanimacisbocuk/auth/users` |
+| **이메일 인증 켜기·비밀번호 정책** | `https://supabase.com/dashboard/project/suoaovdanimacisbocuk/auth/providers?provider=Email` |
+| **Site URL · Redirect URLs** | `https://supabase.com/dashboard/project/suoaovdanimacisbocuk/auth/url-configuration` |
+| **이메일 템플릿** (§4.6) | `https://supabase.com/dashboard/project/suoaovdanimacisbocuk/auth/templates` |
+| **공개 키 확인** (§3) | `https://supabase.com/dashboard/project/suoaovdanimacisbocuk/settings/api-keys` |
+| **테이블 내용 보기** | `https://supabase.com/dashboard/project/suoaovdanimacisbocuk/editor` |
+
+> 주소의 `suoaovdanimacisbocuk` 부분이 프로젝트 ref 다. 다른 프로젝트를 쓰게 되면
+> 그 부분만 바꾸면 된다. 로그인된 상태에서 `suoaovdanimacisbocuk` 대신 `_` 를 넣어도
+> 현재 프로젝트로 열린다.
+>
+> 왼쪽 사이드바에서 찾을 때는 — 위쪽에 아이콘들이 세로로 있고, 그중
+> **사람 모양(Authentication)** 이 회원·인증 관련 화면이다. 그 아이콘을
+> 누르면 하위 메뉴(`Users`, `Sign In / Providers`, `URL Configuration`,
+> `Emails`, `Logs` …)가 펼쳐진다. **⚙ 톱니바퀴(Project Settings)** 는
+> 맨 아래에 있다.
+
+---
+
 ## 1. 프로젝트 생성
 
 1. https://supabase.com/dashboard 로그인
@@ -442,16 +470,75 @@ Supabase 내장 메일러는 **시간당 발송 수가 매우 적다** (무료 �
 
 ## 5. 관리자 계정 만들기
 
-1. 앱에서 `/signup` 으로 가입 → 받은 메일의 링크 클릭 → 인증 완료
-2. Supabase **SQL Editor** 에서 역할을 올린다 (`내닉네임` 을 실제 값으로)
+메일이 오지 않아 가입을 끝낼 수 없거나 비밀번호를 잊었을 때도 이 방법으로
+계정을 만들 수 있다.
+
+### 5.0 먼저 — 0002 마이그레이션 적용 (한 번만)
+
+0001 의 트리거는 닉네임이 없으면 실패하고, **그러면 계정 생성 자체가
+롤백된다.** 대시보드로 사용자를 만들거나 SQL 로 직접 넣으려면 먼저 이걸
+고쳐야 한다.
+
+SQL Editor 에 [`supabase/migrations/0002_profile_nickname_fallback.sql`](supabase/migrations/0002_profile_nickname_fallback.sql)
+을 붙여넣고 Run 한다. 결과가 1행(`on_auth_user_created`) 나오면 정상이다.
+
+### 5.1 방법 A — SQL 한 번으로 (권장)
+
+SQL Editor 만 쓰면 되므로 메뉴를 찾을 필요가 없다.
+
+1. [`supabase/create_admin.sql`](supabase/create_admin.sql) 을 연다
+2. 파일 상단의 **세 줄만** 자기 값으로 바꾼다 (파일은 저장하지 않고,
+   SQL Editor 에 붙여넣은 쪽에서 고치면 된다)
 
 ```sql
-update public.profiles
-   set role = 'admin'
- where nickname = '내닉네임';
+v_email    text := 'admin@example.com';
+v_password text := 'CHANGE-ME-10자이상';
+v_nickname text := '운영자';
 ```
 
-3. 앱에서 로그아웃 후 다시 로그인하면 헤더에 `관리자` 링크가 보인다
+3. 전체를 복사해 SQL Editor 에 붙여넣고 Run
+
+이 스크립트는:
+
+- 이메일 인증이 **이미 완료된** 상태로 계정을 만든다 (메일 필요 없음)
+- `profiles.role` 을 `admin` 으로 올린다
+- 같은 이메일이 이미 있으면 **비밀번호를 재설정**하고 관리자로 지정한다
+  → 비밀번호를 잊었을 때도 이걸 그대로 다시 돌리면 된다
+
+마지막 결과 표에 `권한 = admin`, `인증완료 = true` 가 보이면 성공이다.
+앱에서 그 이메일·비밀번호로 로그인하면 헤더에 `관리자` 링크가 나온다.
+
+### 5.2 방법 B — 대시보드 화면에서
+
+SQL 이 부담스러우면 이쪽도 된다. **5.0 을 먼저 적용해야 한다.**
+
+1. 아래 주소를 브라우저에 붙여넣는다 (이 프로젝트 전용 주소다)
+
+```
+https://supabase.com/dashboard/project/suoaovdanimacisbocuk/auth/users
+```
+
+2. 오른쪽 위 **`Add user`** → **`Create new user`**
+3. 이메일과 비밀번호를 넣고 **`Auto Confirm User`** 를 **켠다**
+   (이걸 켜야 메일 인증 없이 바로 쓸 수 있다)
+4. **Create user**
+5. 닉네임은 자동 생성된다 (`회원xxxxxx` 형태). 바꾸려면 앱의 `내 정보` 에서
+   변경하거나, SQL Editor 에서:
+
+```sql
+update public.profiles set nickname = '운영자' where nickname like '회원%';
+```
+
+6. 관리자 권한은 SQL Editor 에서 올린다
+
+```sql
+update public.profiles set role = 'admin' where nickname = '운영자';
+```
+
+### 5.3 이미 만든 계정의 비밀번호를 잊었을 때
+
+방법 A 의 스크립트를 같은 이메일로 다시 돌리면 비밀번호가 재설정된다.
+메일은 필요 없다.
 
 ## 6. 동작 확인
 
