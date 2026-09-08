@@ -26,15 +26,19 @@ Vercel 계정 생성과 로그인은 직접 하셔야 한다. 그 외에 필요�
 
 | Name | Value |
 |---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | `https://suoaovdanimacisbocuk.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `.env.local` 의 `sb_publishable_...` 값 그대로 |
-| `NEXT_PUBLIC_SITE_URL` | **1차 배포 후에 넣는다** (§4 참고) |
+| `SUPABASE_URL` | `https://suoaovdanimacisbocuk.supabase.co` |
+| `SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_BvN91QIv_SDfhIbLPhk8Pw_8no04U9f` |
+| `SITE_URL` | **1차 배포 후에 넣는다** (§4 참고) |
 
-> `NEXT_PUBLIC_SITE_URL` 은 배포 주소가 정해진 뒤에야 알 수 있다. 지금은
+> `SITE_URL` 은 배포 주소가 정해진 뒤에야 알 수 있다. 지금은
 > 비워 두면 된다 — 코드가 Vercel 이 주는 주소를 자동으로 읽는다
 > (`lib/site.ts`). §4 에서 정확한 값으로 고정한다.
 >
 > **secret 키(`sb_secret_...`)는 넣지 않는다.** 이 프로젝트는 쓰지 않는다.
+>
+> **`NEXT_PUBLIC_` 접두사를 붙이지 않는다.** 붙이면 Vercel 이
+> "값이 브라우저에 노출된다"며 저장을 막는다. 이 값들은 서버에서만
+> 읽히므로 접두사가 필요 없다.
 
 ## 3. Deploy
 
@@ -60,7 +64,7 @@ Vercel 프로젝트 → **Settings → Environment Variables** 에서 추가/수
 
 | Name | Value |
 |---|---|
-| `NEXT_PUBLIC_SITE_URL` | `https://<배포주소>` (끝에 `/` 없이) |
+| `SITE_URL` | `https://<배포주소>` (끝에 `/` 없이) |
 
 저장 후 **Deployments → 최신 배포 → ⋯ → Redeploy**.
 환경변수는 빌드 시점에 박히므로 **재배포해야 반영된다.**
@@ -106,7 +110,7 @@ Vercel Hobby 플랜은 **비상업적 용도로만** 허용된다. 지금은 무
 
 의도한 것이다. 변호사 검토 전 법적 고지문과 미확정 사업자 정보가 색인되면
 지워도 캐시에 남는다. 정식 오픈 시점에 Vercel 환경변수로
-`NEXT_PUBLIC_ALLOW_INDEXING=true` 를 추가하고 재배포하면 열린다.
+`ALLOW_INDEXING=true` 를 추가하고 재배포하면 열린다.
 코드 수정은 필요 없다.
 
 ### 저장소가 Public 이다

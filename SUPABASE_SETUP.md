@@ -194,17 +194,17 @@ cp .env.local.example .env.local
 **`=` 뒤에만** 값을 붙인다.
 
 ```env
-NEXT_PUBLIC_SITE_URL=http://localhost:3200
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+SITE_URL=http://localhost:3200
+SUPABASE_URL=
+SUPABASE_PUBLISHABLE_KEY=
 ```
 
 채우면 이렇게 된다:
 
 ```env
-NEXT_PUBLIC_SITE_URL=http://localhost:3200
-NEXT_PUBLIC_SUPABASE_URL=https://abcdefghijklmnop.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_A1b2C3d4E5f6G7h8I9j0
+SITE_URL=http://localhost:3200
+SUPABASE_URL=https://abcdefghijklmnop.supabase.co
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_A1b2C3d4E5f6G7h8I9j0
 ```
 
 **주의 4가지**
@@ -247,9 +247,9 @@ grep -v "^#" .env.local | grep .
 세 줄이 나오고 **모두 `=` 뒤에 값이 있어야** 한다. 아래처럼 나오면 아직 안 채운 것이다.
 
 ```
-NEXT_PUBLIC_SITE_URL=http://localhost:3200
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+SITE_URL=http://localhost:3200
+SUPABASE_URL=
+SUPABASE_PUBLISHABLE_KEY=
 ```
 
 > `.env.local` 은 `.gitignore` 의 `.env*` 규칙으로 커밋되지 않는다.
@@ -306,7 +306,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 
 - Site URL 을 `https://<도메인>` 으로 변경
 - Redirect URLs 에 `https://<도메인>/auth/confirm` 과 `.../auth/callback` 추가
-- `.env.local` (또는 Vercel 환경변수) 의 `NEXT_PUBLIC_SITE_URL` 도 같이 변경
+- `.env.local` (또는 Vercel 환경변수) 의 `SITE_URL` 도 같이 변경
 
 > Supabase 는 와일드카드(`**`)를 허용하지만 **쓰지 않는다.** 정확한 경로만
 > 등록한다 — 와일드카드는 의도치 않은 주소로 인증 코드가 전달될 여지를 만든다.
