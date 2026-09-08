@@ -20,11 +20,10 @@ export interface ActionState {
 
 export const idle: ActionState = { ok: false };
 
-export const fail = (message: string, fieldErrors?: FieldErrors): ActionState => ({
-  ok: false,
-  message,
-  fieldErrors,
-});
+export const fail = (
+  message: string,
+  fieldErrors?: FieldErrors,
+): ActionState => ({ ok: false, message, fieldErrors });
 
 export const succeed = (message?: string): ActionState => ({
   ok: true,
@@ -43,35 +42,84 @@ export function fromZod(error: z.ZodError): ActionState {
 }
 
 /**
- * Supabase 오류 메시지를 사용자 언어로 바꾼다.
- * 원문은 영어이고 내부 구조를 노출하기도 한다.
+ * Supabase 오류를 사용자 언어로 바꾼다.
+ *
+ * 문자열이 아니라 **오류 코드로 판정**한다 — 메시지 원문은 버전에 따라
+ * 바뀌지만 코드는 안정적이다 (AuthError.code / PostgrestError.code).
+ * 코드가 없는 경우에만 문자열 패턴으로 넘어간다.
  */
-export function fromSupabase(message: string): string {
-  const m = message.toLowerCase();
+interface SupabaseErrorish {
+  code?: string | null;
+  message: string;
+}
 
-  if (m.includes("invalid login credentials")) {
-    return "이메일 또는 비밀번호가 올바르지 않습니다.";
+/** 오류 코드 → 한국어 메시지 */
+const BY_CODE: Record<string, string> = {
+  // ── 인증
+  invalid_credentials: "이메일 또는 비밀번호가 올바르지 않습니다.",
+  email_not_confirmed:
+    "이메일 인증이 완료되지 않았습니다. 받은 메일의 링크를 눌러 주세요.",
+  email_exists: "이미 가입된 이메일입니다.",
+  user_already_exists: "이미 가입된 이메일입니다.",
+  weak_password:
+    "이미 유출된 적이 있거나 너무 단순한 비밀번호입니다. 다른 비밀번호를 사용해 주세요.",
+  same_password: "현재 비밀번호와 같습니다. 다른 비밀번호를 입력해 주세요.",
+  otp_expired:
+    "인증 링크가 만료되었거나 이미 사용되었습니다. 메일을 다시 요청해 주세요.",
+  signup_disabled: "현재 신규 가입이 중단되어 있습니다.",
+  user_banned: "이용이 제한된 계정입니다.",
+  email_address_invalid: "이메일 주소 형식이 올바르지 않습니다.",
+  email_provider_disabled: "이메일 로그인이 비활성화되어 있습니다.",
+  captcha_failed: "사람 확인에 실패했습니다. 다시 시도해 주세요.",
+  bad_code_verifier:
+    "인증을 시작한 브라우저와 링크를 연 브라우저가 다릅니다. 같은 브라우저에서 다시 시도해 주세요.",
+
+  // ── 발송 한도 — 지금 가장 자주 만나는 오류
+  over_email_send_rate_limit:
+    "메일 발송 한도를 초과했습니다. Supabase 기본 메일러는 시간당 발송 수가 매우 적습니다. 잠시 후 다시 시도하거나 커스텀 SMTP 를 연결해 주세요.",
+  over_request_rate_limit:
+    "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
+
+  // ── DB (Postgres SQLSTATE)
+  "42501": "권한이 없습니다.",
+  "23505": "이미 사용 중인 값입니다.",
+  "23503": "존재하지 않는 대상입니다.",
+  "23514": "입력값이 허용 범위를 벗어났습니다.",
+};
+
+/** 코드가 없을 때만 쓰는 문자열 패턴 */
+const BY_TEXT: [RegExp, string][] = [
+  [/invalid login credentials/i, "이메일 또는 비밀번호가 올바르지 않습니다."],
+  [
+    /email not confirmed/i,
+    "이메일 인증이 완료되지 않았습니다. 받은 메일의 링크를 눌러 주세요.",
+  ],
+  [/already (been )?registered|already exists/i, "이미 가입된 이메일입니다."],
+  [
+    /you can only request this after (\d+) seconds?/i,
+    "너무 자주 요청했습니다. 잠시 후 다시 시도해 주세요.",
+  ],
+  [
+    /email rate limit exceeded/i,
+    "메일 발송 한도를 초과했습니다. 잠시 후 다시 시도하거나 커스텀 SMTP 를 연결해 주세요.",
+  ],
+  [/rate limit|too many requests/i, "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요."],
+  [/profiles_nickname_key/i, "이미 사용 중인 닉네임입니다."],
+  [/대댓글은 1단계/, "대댓글은 1단계까지만 작성할 수 있습니다."],
+  [/row-level security/i, "권한이 없습니다."],
+];
+
+export function fromSupabase(error: SupabaseErrorish | string): string {
+  const code = typeof error === "string" ? undefined : error.code ?? undefined;
+  const message = typeof error === "string" ? error : error.message;
+
+  if (code && BY_CODE[code]) return BY_CODE[code];
+
+  for (const [re, text] of BY_TEXT) {
+    if (re.test(message)) return text;
   }
-  if (m.includes("email not confirmed")) {
-    return "이메일 인증이 완료되지 않았습니다. 받은 메일의 링크를 확인해 주세요.";
-  }
-  if (m.includes("user already registered") || m.includes("already been registered")) {
-    return "이미 가입된 이메일입니다.";
-  }
-  if (m.includes("profiles_nickname_key") || m.includes("duplicate key")) {
-    return "이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해 주세요.";
-  }
-  if (m.includes("password") && m.includes("weak")) {
-    return "이미 유출된 적이 있는 비밀번호입니다. 다른 비밀번호를 사용해 주세요.";
-  }
-  if (m.includes("rate limit") || m.includes("too many requests")) {
-    return "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.";
-  }
-  if (m.includes("대댓글은 1단계")) {
-    return "대댓글은 1단계까지만 작성할 수 있습니다.";
-  }
-  if (m.includes("row-level security") || m.includes("violates row-level")) {
-    return "권한이 없습니다.";
-  }
+
+  // 원인을 못 찾으면 서버 로그에 원문을 남긴다. 사용자에게는 노출하지 않는다.
+  console.error("[supabase] 미분류 오류:", code ?? "(no code)", message);
   return "처리 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.";
 }

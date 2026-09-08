@@ -47,7 +47,7 @@ export async function createPostAction(
     .select("id")
     .single();
 
-  if (error) return fail(fromSupabase(error.message));
+  if (error) return fail(fromSupabase(error));
 
   revalidatePath("/");
   revalidatePath(`/c/${category.slug}`);
@@ -82,7 +82,7 @@ export async function updatePostAction(
     .select("id, category:categories!posts_category_id_fkey ( slug )")
     .single();
 
-  if (error) return fail(fromSupabase(error.message));
+  if (error) return fail(fromSupabase(error));
 
   const slug = (updated as unknown as { category: { slug: string } }).category
     .slug;

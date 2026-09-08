@@ -57,7 +57,7 @@ export async function createCommentAction(
     content: parsed.data.content,
   });
 
-  if (error) return fail(fromSupabase(error.message));
+  if (error) return fail(fromSupabase(error));
 
   await revalidatePost(parsed.data.postId);
   return succeed();
@@ -83,7 +83,7 @@ export async function updateCommentAction(
     .select("post_id")
     .single();
 
-  if (error) return fail(fromSupabase(error.message));
+  if (error) return fail(fromSupabase(error));
 
   await revalidatePost(data.post_id);
   return succeed();

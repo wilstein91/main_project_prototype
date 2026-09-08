@@ -57,7 +57,7 @@ export async function updateNicknameAction(
     })
     .eq("id", profile.id);
 
-  if (error) return fail(fromSupabase(error.message));
+  if (error) return fail(fromSupabase(error));
 
   revalidatePath("/", "layout");
   return succeed("닉네임을 변경했습니다.");
@@ -85,7 +85,7 @@ export async function withdrawAction(
     .update({ status: "withdrawn", updated_at: new Date().toISOString() })
     .eq("id", profile.id);
 
-  if (error) return fail(fromSupabase(error.message));
+  if (error) return fail(fromSupabase(error));
 
   await supabase.auth.signOut();
   revalidatePath("/", "layout");

@@ -47,7 +47,7 @@ export async function signUpAction(
     });
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -57,10 +57,55 @@ export async function signUpAction(
     },
   });
 
-  if (error) return fail(fromSupabase(error.message));
+  if (error) return fail(fromSupabase(error));
+
+  /**
+   * 이미 가입된 이메일이면 Supabase 는 오류를 내지 않는다 — 계정 존재
+   * 여부를 노출하지 않으려는 설계다. 대신 user.identities 가 빈 배열로
+   * 온다. 이 경우 메일도 발송되지 않으므로, 안내하지 않으면 사용자는
+   * "메일이 안 온다" 는 상태에 갇힌다.
+   */
+  if (data.user && data.user.identities?.length === 0) {
+    return fail(
+      "이미 가입된 이메일입니다. 로그인하거나, 비밀번호를 잊으셨다면 재설정을 이용해 주세요.",
+      { email: ["이미 가입된 이메일입니다."] },
+    );
+  }
 
   return succeed(
     "인증 메일을 보냈습니다. 메일의 링크를 눌러 가입을 완료해 주세요.",
+  );
+}
+
+/**
+ * 인증 메일 재발송 (F-101 보조)
+ *
+ * 아직 인증하지 않은 계정에만 동작한다. 이미 인증된 계정이나 없는
+ * 계정에는 발송되지 않으며, 그 사실을 응답으로 구분해 주지 않는다.
+ *
+ * 기본 메일러의 발송 한도가 매우 낮아 여기서 한도 초과가 자주 나온다.
+ * fromSupabase 가 그 상황을 사용자 언어로 설명한다.
+ */
+export async function resendSignUpAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  if (!isSupabaseConfigured()) return NOT_CONFIGURED;
+
+  const parsed = resetRequestSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return fromZod(parsed.error);
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email: parsed.data.email,
+    options: { emailRedirectTo: `${SITE_URL}/auth/confirm` },
+  });
+
+  if (error) return fail(fromSupabase(error));
+
+  return succeed(
+    "아직 인증하지 않은 계정이라면 메일을 다시 보냈습니다. 스팸함도 확인해 주세요.",
   );
 }
 
@@ -79,7 +124,7 @@ export async function signInAction(
     password: parsed.data.password,
   });
 
-  if (error) return fail(fromSupabase(error.message));
+  if (error) return fail(fromSupabase(error));
 
   revalidatePath("/", "layout");
   redirect(safeRedirect(parsed.data.redirect));
@@ -132,7 +177,7 @@ export async function updatePasswordAction(
   const { error } = await supabase.auth.updateUser({
     password: parsed.data.password,
   });
-  if (error) return fail(fromSupabase(error.message));
+  if (error) return fail(fromSupabase(error));
 
   return succeed("비밀번호를 변경했습니다.");
 }
