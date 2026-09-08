@@ -1,14 +1,27 @@
 /**
- * 청룡언월도 마크 — DESIGN.md §3
+ * 청룡언월도 마크 (작은 크기용) — DESIGN.md §3
  *
- * 언월도를 글자처럼 읽히는 정도까지 줄였다. 만화 컬러판을 따라
- * **잉크선 + 평면 채움 2톤**이며 그라디언트는 쓰지 않는다.
+ * ## 네 번 다시 그렸다
  *
- * 첫 버전은 날이 너무 얇아 22px 에서 사선 획처럼 보였다. 작은 크기에서는
- * 알아볼 수 있는 특징이 3~4개뿐이라, **날의 면적**과 **자루의 굵기** 두
- * 가지에 몰아주고 나머지(갈고리·물미·하이라이트)는 버린다.
+ * v1 은 날이 얇아 22px 에서 사선 획으로 보였다. v2 는 날을 살찌웠더니
+ * 자루가 묻혀 초승달이 되었다. v3 은 자루를 뽑았지만 26px 에서
+ * **잎사귀**로 읽혔다 — 날의 안쪽까지 볼록해 전체가 뾰족한 렌즈가
+ * 되었기 때문이다. 큰 크기에서는 도끼로 보였다.
+ *
+ * v4 에서 세 가지를 바꿨다.
+ *
+ * 1. **안쪽 선을 오목하게.** 등(위)은 볼록, 인(아래)은 오목이라야
+ *    렌즈가 아니라 휜 칼날이 된다. 언월도의 실루엣은 여기서 나온다.
+ * 2. **색을 하나 더.** 20px 에서 형태로 구별되는 특징은 서너 개가
+ *    한계지만, 색은 형태보다 작아져도 살아남는다. 금 투겁과 붉은 술을
+ *    넣으면 잎사귀·붓·도끼와 한눈에 갈린다. 만화 삼국지 컬러판이
+ *    무기를 그리는 방식이기도 하다 — 먹선 + 평면 채움 + 금과 주홍.
+ * 3. **[[BladeCrest]] 와 실루엣을 통일.** 큰 삽화와 작은 마크가 다른
+ *    물건처럼 보이면 로고가 두 개인 셈이다. 같은 기울기, 같은 날 곡선을
+ *    쓰고 선 굵기만 작은 크기에 맞춰 올렸다.
  *
  * 회전 애니메이션·워터마크·반복 배경은 금지 (DESIGN.md §3.1).
+ * 40px 이상 자리에는 이걸 확대하지 말고 BladeCrest 를 쓴다.
  */
 export function BladeMark({
   size = 24,
@@ -16,12 +29,12 @@ export function BladeMark({
   className = "",
 }: {
   size?: number;
-  /** 작은 크기용 — 디테일을 버리고 날과 자루만 남긴다 */
+  /** 아주 작은 크기용 — 갈고리를 버리고 날·자루·색만 남긴다 */
   plain?: boolean;
   className?: string;
 }) {
-  // 28px 아래에서는 디테일이 뭉친다. 헤더(22px)도 여기 걸린다.
-  const simple = plain || size < 28;
+  // 20px 아래에서는 갈고리가 날에 붙어 뭉친다
+  const simple = plain || size < 20;
   const ink = "var(--color-ink)";
 
   return (
@@ -34,73 +47,50 @@ export function BladeMark({
       aria-label="영웅호걸닷컴"
       fill="none"
     >
-      {/*
-       * 자루가 마크의 대각선을 만들고, 날이 그 위에 얹힌다.
-       * 자루를 짧게 두면 잎사귀·초승달로 읽힌다 — 장병기는 자루가
-       * 보여야 무기로 읽힌다.
-       */}
-      <g transform="rotate(12 24 24)">
-        {/* 자루 — 아래에서 위로 길게. 마크의 골격이다 */}
+      {/* 자루 — 장병기는 자루가 보여야 무기로 읽힌다 */}
+      <path
+        d="M14 46 L25.5 14.5"
+        stroke={ink}
+        strokeWidth="4.6"
+        strokeLinecap="round"
+      />
+
+      {/* 날 — 등은 볼록, 인은 오목 */}
+      <path
+        d="M25.5 14.5 C32 12 37.5 7.5 41 2 C40 11 36 17.5 28 21 Z"
+        fill="var(--color-brand)"
+        stroke={ink}
+        strokeWidth="2.7"
+        strokeLinejoin="round"
+      />
+
+      {/* 등날 갈고리 — 언월도의 특징 */}
+      {!simple && (
         <path
-          d="M14.5 44 L21 17"
+          d="M25.5 16.8 C21 16 19.5 12 21.5 8.5"
           stroke={ink}
-          strokeWidth={simple ? 4.6 : 4}
+          strokeWidth="3"
           strokeLinecap="round"
         />
+      )}
 
-        {/* 물미 (자루 끝) */}
-        {!simple && (
-          <path
-            d="M11.6 43.2 L17.4 44.8"
-            stroke={ink}
-            strokeWidth="2.6"
-            strokeLinecap="round"
-          />
-        )}
+      {/* 금 투겁 — 날과 자루를 잇고, 작은 크기에서 색으로 구별을 만든다 */}
+      <path
+        d="M21.5 24 L25 15.5"
+        stroke="var(--color-gold)"
+        strokeWidth="5.6"
+        strokeLinecap="round"
+      />
 
-        {/*
-         * 초승달 날 — 자루 위쪽에 얹혀 오른쪽으로 휜다.
-         * 바깥 호는 크게, 안쪽 호는 얕게 돌아와 가운데가 두껍다.
-         * 이 두께가 작은 크기에서 형태를 살린다.
-         */}
-        <path
-          d="M20 18
-             C27 15 34 10 39 3
-             C43 12 40 24 27 28
-             Z"
-          fill="var(--color-brand)"
-          stroke={ink}
-          strokeWidth={simple ? 2.8 : 2.3}
-          strokeLinejoin="round"
-        />
-
-        {/* 날 끝 하이라이트 — 컬러판의 평면 하이라이트 한 겹 */}
-        {!simple && (
-          <path
-            d="M35.2 8.4 C37 5.6 38.6 3.2 38.6 3.2
-               C40.6 7 40.8 11.6 40 14.8 Z"
-            fill="var(--color-blade)"
-          />
-        )}
-
-        {/* 등날 갈고리 — 언월도의 특징. 작을 때는 버린다 */}
-        {!simple && (
-          <path
-            d="M20.4 19.4 C16.4 19 14.4 16.2 15 13.2"
-            stroke={ink}
-            strokeWidth="2.3"
-            strokeLinecap="round"
-          />
-        )}
-
-        {/* 날과 자루가 만나는 목 — 두 덩어리를 이어 준다 */}
-        <path
-          d="M17 19.6 L25 17.6"
-          stroke={ink}
-          strokeWidth={simple ? 3.8 : 3.2}
-          strokeLinecap="round"
-        />
-      </g>
+      {/* 붉은 술 */}
+      <circle
+        cx="20"
+        cy="27"
+        r="3.3"
+        fill="var(--color-tassel)"
+        stroke={ink}
+        strokeWidth="1.6"
+      />
     </svg>
   );
 }

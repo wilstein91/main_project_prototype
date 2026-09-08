@@ -1,3 +1,4 @@
+import { BladeCrest } from "@/components/brand/BladeCrest";
 import { ButtonLink } from "@/components/ui/Button";
 import { COMPANY, displayServiceName } from "@/config/company";
 
@@ -31,11 +32,21 @@ const PRINCIPLES = [
 export default function AboutPage() {
   return (
     <div className="px-4 py-6 lg:px-0 lg:py-0">
-      <header className="mb-8">
-        <h1 className="text-[26px] font-bold leading-snug text-ink">
-          {COMPANY.serviceName}
-        </h1>
-        <p className="mt-1.5 text-list text-ink-sub">{COMPANY.tagline}</p>
+      {/*
+       * 이름의 근거를 그림으로 먼저 보여준다. 아래 본문에서 '영웅호걸'
+       * 이라는 이름의 출처를 설명하는데, 그 설명과 마크가 같은 자리에
+       * 있어야 로고가 장식이 아니라 뜻으로 읽힌다 (DESIGN.md §3.3).
+       */}
+      <header className="mb-8 flex items-center gap-5 rounded-[var(--radius-md)] bg-brand-soft px-5 py-6 lg:gap-7 lg:px-7">
+        <BladeCrest size={116} className="shrink-0" />
+        <div className="min-w-0">
+          <h1 className="text-[26px] font-black leading-snug tracking-[-0.02em] text-ink">
+            {COMPANY.serviceName}
+          </h1>
+          <p className="mt-1.5 text-list leading-relaxed text-ink-sub">
+            {COMPANY.tagline}
+          </p>
+        </div>
       </header>
 
       <section className="mb-10 flex flex-col gap-4 text-body leading-[1.75] text-ink">

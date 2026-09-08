@@ -21,8 +21,20 @@
   --color-brand: #0f6e63;
   --color-brand-strong: #0b5a51; /* 주요 버튼 hover */
   --color-brand-soft: #e4f0ee;
-  --color-blade: #3fa79a; /* 로고 날 하이라이트 — 로고 전용 */
   --color-danger: #c0392f;
+
+  /* ── 로고·삽화 전용 ─────────────────────────────────────────
+     만화 삼국지 컬러판의 배색이다. 먹선 + 평면 채움에 금과 주홍을
+     얹는다. UI 크롬(버튼·배경·테두리)에는 쓰지 않는다 — 여기에 쓰면
+     화면이 금방 무거워진다. 마크와 삽화 안에서만 쓴다.
+     ────────────────────────────────────────────────────────── */
+  --color-ink-lit: #3a4a48; /* 먹선 위 밝은 결 */
+  --color-blade: #3fa79a; /* 날 하이라이트 */
+  --color-blade-lit: #7fc9be; /* 날 끝 */
+  --color-gold: #c8922a; /* 투겁·물미 */
+  --color-gold-lit: #eccb72;
+  --color-tassel: #c0392f; /* 술 */
+  --color-tassel-dark: #8e2018;
 
   /* 개발 모드 경고 배너 */
   --color-warn: #f0c14b;
