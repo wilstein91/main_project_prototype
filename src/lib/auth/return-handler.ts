@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { safeInternalPath } from "@/lib/safe-path";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -31,14 +32,6 @@ const ALLOWED_TYPES: readonly EmailOtpType[] = [
   "invite",
 ];
 
-/** 내부 경로만 허용 (오픈 리다이렉트 방지) */
-function safePath(value: string | null, fallback: string): string {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) {
-    return fallback;
-  }
-  return value;
-}
-
 function failure(origin: string, reason: string) {
   return NextResponse.redirect(
     `${origin}/login?error=auth_callback&reason=${reason}`,
@@ -51,7 +44,7 @@ function successPath(
   type: EmailOtpType | null,
 ): string {
   const fallback = type === "recovery" ? "/settings?reset=1" : "/";
-  return safePath(searchParams.get("next"), fallback);
+  return safeInternalPath(searchParams.get("next"), fallback);
 }
 
 export async function handleAuthReturn(

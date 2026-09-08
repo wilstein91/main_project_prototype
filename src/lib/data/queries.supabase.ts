@@ -98,6 +98,25 @@ async function getPosts({
   if (categoryId) query = query.eq("category_id", categoryId);
 
   const { data, error, count } = await query;
+
+  /**
+   * 범위를 벗어난 페이지 요청 — PostgREST 는 416 PGRST103 을 준다.
+   * (예: /c/free?page=99999)
+   *
+   * 이걸 오류로 던지면 주소창에 큰 숫자를 넣은 것만으로 500 이 난다.
+   * 빈 페이지로 취급하고, 전체 개수는 따로 세어 페이지네이션을 유지한다.
+   * 그러면 사용자가 이전 페이지로 돌아갈 수 있다.
+   */
+  if (error?.code === "PGRST103") {
+    let countQuery = supabase
+      .from("posts")
+      .select("id", { count: "exact", head: true });
+    if (!includeDeleted) countQuery = countQuery.eq("is_deleted", false);
+    if (categoryId) countQuery = countQuery.eq("category_id", categoryId);
+    const { count: total } = await countQuery;
+    return { items: [], total: total ?? 0 };
+  }
+
   if (error) throw new Error(`글 목록 조회 실패: ${error.message}`);
 
   const items: PostListItem[] = (data ?? []).map((row) => {

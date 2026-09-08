@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DevAuthBanner } from "@/components/layout/DevAuthBanner";
 import { COMPANY } from "@/config/company";
 import { FOOTER_NOTICE } from "@/config/legal";
 
@@ -6,6 +7,7 @@ import { FOOTER_NOTICE } from "@/config/legal";
 export default function AuthLayout({ children }: LayoutProps<"/">) {
   return (
     <div className="flex min-h-full flex-col">
+      <DevAuthBanner />
       <header className="border-b border-line">
         <div className="mx-auto flex h-14 max-w-md items-center px-5">
           <Link

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { safeInternalPath } from "@/lib/safe-path";
 import { SITE_URL } from "@/lib/site";
 import {
   resetRequestSchema,
@@ -16,13 +17,6 @@ import { fail, fromSupabase, fromZod, succeed, type ActionState } from "./result
 const NOT_CONFIGURED = fail(
   "아직 데이터베이스가 연결되지 않았습니다. .env.local 에 Supabase 키를 넣어주세요.",
 );
-
-/** 리다이렉트 대상은 반드시 내부 경로여야 한다 (오픈 리다이렉트 방지) */
-function safeRedirect(target: string | undefined): string {
-  if (!target) return "/";
-  if (!target.startsWith("/") || target.startsWith("//")) return "/";
-  return target;
-}
 
 export async function signUpAction(
   _prev: ActionState,
@@ -127,7 +121,7 @@ export async function signInAction(
   if (error) return fail(fromSupabase(error));
 
   revalidatePath("/", "layout");
-  redirect(safeRedirect(parsed.data.redirect));
+  redirect(safeInternalPath(parsed.data.redirect));
 }
 
 export async function signOutAction(): Promise<void> {

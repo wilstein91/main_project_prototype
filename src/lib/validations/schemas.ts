@@ -59,9 +59,17 @@ export const updatePasswordSchema = z.object({ password: passwordSchema });
 
 export const updateNicknameSchema = z.object({ nickname: nicknameSchema });
 
-/** 체크박스는 체크됐을 때만 "on" 으로 넘어온다 */
+/**
+ * 체크박스는 **체크됐을 때만** "on" 으로 넘어온다. 체크하지 않으면
+ * 키 자체가 FormData 에 없다.
+ *
+ * z.union([z.literal("on"), z.undefined()]) 로는 안 된다 — zod 는 "키가
+ * 없는 것" 과 "값이 undefined 인 것" 을 다르게 보므로 .optional() 이
+ * 필요하다. 이 차이 때문에 체크 없이 글을 쓰면 파싱이 실패했다.
+ */
 const checkbox = z
-  .union([z.literal("on"), z.undefined()])
+  .literal("on")
+  .optional()
   .transform((v) => v === "on");
 
 export const postSchema = z.object({

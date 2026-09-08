@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { SignInForm } from "@/components/auth/SignInForm";
 import { PendingNotice } from "@/components/ui/PendingNotice";
 import { isSeedMode } from "@/lib/data/queries";
+import { safeInternalPath } from "@/lib/safe-path";
 import { getViewer } from "@/lib/session";
 
 export const metadata = { title: "로그인" };
@@ -35,10 +36,12 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const viewer = await getViewer();
   if (viewer) redirect("/");
 
-  const target =
-    typeof redirectParam === "string" && redirectParam.startsWith("/")
-      ? redirectParam
-      : undefined;
+  // 폼의 hidden 값으로 그대로 들어가므로 여기서도 검증한다
+  const validated =
+    typeof redirectParam === "string"
+      ? safeInternalPath(redirectParam, "")
+      : "";
+  const target = validated || undefined;
 
   const message =
     error === "auth_callback"

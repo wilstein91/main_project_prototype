@@ -1,5 +1,6 @@
 import { BottomTab } from "@/components/layout/BottomTab";
 import { CategoryNav } from "@/components/layout/CategoryNav";
+import { DevAuthBanner } from "@/components/layout/DevAuthBanner";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { getCategories } from "@/lib/data/queries";
@@ -20,6 +21,7 @@ export default async function MainLayout({ children }: LayoutProps<"/">) {
 
   return (
     <div className="flex min-h-full flex-col">
+      <DevAuthBanner />
       <Header />
       <CategoryNav categories={categories} variant="chips" />
 
