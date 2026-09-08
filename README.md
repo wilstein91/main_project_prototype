@@ -2,10 +2,16 @@
 
 투자정보 공유 커뮤니티 플랫폼. 개인 투자자들이 정보와 의견을 나누는 게시판 서비스다.
 
-- [PRD.md](PRD.md) — 요구사항, 트랙 분리 정책, 법적 고지문
-- [TECH_SPEC.md](TECH_SPEC.md) — 아키텍처, DB 스키마·RLS, 작업 티켓
-- [SUPABASE_SETUP.md](SUPABASE_SETUP.md) — DB 연결 절차
-- [DEPLOY.md](DEPLOY.md) — **Vercel 배포 절차 (다음 할 일)**
+| 문서 | 용도 |
+|---|---|
+| [WORK_UNITS.md](WORK_UNITS.md) | **지금 어디까지 왔는가** ← 진행 상황은 여기 |
+| [FINAL_CHECKLIST.md](FINAL_CHECKLIST.md) | **오픈 전 최종 관문** (기능·비정상 접근·보안) |
+| [PRD.md](PRD.md) | 무엇을 만드는가 — 요구사항, 트랙 분리, 법적 고지문 |
+| [TECH_SPEC.md](TECH_SPEC.md) | 어떻게 만드는가 — 아키텍처, 스키마·RLS, 티켓 정의 |
+| [SUPABASE_SETUP.md](SUPABASE_SETUP.md) | DB 연결 절차 |
+| [DEPLOY.md](DEPLOY.md) | 배포 절차 |
+
+배포: https://namjosunhero.vercel.app (색인 차단 중)
 
 ## 현재 상태
 
@@ -42,6 +48,8 @@ cp .env.local.example .env.local
 | 명령 | 설명 |
 |---|---|
 | `npm run dev` | 개발 서버 |
+| `npm run test` | 단위 테스트 (DB 불필요) |
+| `npm run test:rls` | RLS·비정상 접근 통합 테스트 (실 DB 필요) |
 | `npm run build` | 프로덕션 빌드 |
 | `npx next typegen` | 라우트 타입 재생성 (`PageProps` 오류 시) |
 | `npx tsc --noEmit` | 타입 검사 |
@@ -83,6 +91,10 @@ cp .env.local.example .env.local
 
 ## 배포 전
 
-[TECH_SPEC.md §10](TECH_SPEC.md) 의 보안·운영 체크리스트를 전부 통과해야 한다. 키 재발급, 이메일 확인, 비밀번호 유출 검사, CAPTCHA·rate limit, RLS, 도메인·Redirect URL, 백업, 무료 티어 한계 — 그리고 §10.9 트랙 분리·규제 표기 점검.
+[FINAL_CHECKLIST.md](FINAL_CHECKLIST.md) 를 전부 통과해야 한다.
+
+**지금 개발 편의로 꺼둔 것이 두 개 있다** — 이메일 인증, 검색엔진 색인.
+둘 다 되돌리는 방법이 체크리스트 D 에 있다. 이메일 인증이 꺼져 있는 동안은
+사이트 상단에 `개발 모드` 배너가 뜬다.
 
 법적 고지문(PRD 부록 A)은 변호사 검토 전 초안이다.
