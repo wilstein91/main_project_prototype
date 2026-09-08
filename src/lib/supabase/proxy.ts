@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/types/database";
-import { isSupabaseConfigured, SUPABASE_ANON_KEY, SUPABASE_URL } from "./config";
+import { isSupabaseConfigured, SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "./config";
 
 /**
  * 세션 갱신 + 보호 경로 판정 — src/proxy.ts 에서 호출한다.
@@ -30,7 +30,7 @@ export async function updateSession(request: NextRequest) {
 
   const supabase = createServerClient<Database>(
     SUPABASE_URL,
-    SUPABASE_ANON_KEY,
+    SUPABASE_PUBLISHABLE_KEY,
     {
       cookies: {
         getAll() {
