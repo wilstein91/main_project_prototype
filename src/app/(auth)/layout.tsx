@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { DevAuthBanner } from "@/components/layout/DevAuthBanner";
-import { COMPANY } from "@/config/company";
+import { Wordmark } from "@/components/brand/Wordmark";
 import { FOOTER_NOTICE } from "@/config/legal";
 
 /** 인증 화면은 사이드바·하단 탭 없이 폼에 집중시킨다. */
@@ -10,11 +10,8 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
       <DevAuthBanner />
       <header className="border-b border-line">
         <div className="mx-auto flex h-14 max-w-md items-center px-5">
-          <Link
-            href="/"
-            className="text-[17px] font-extrabold tracking-tight text-ink"
-          >
-            {COMPANY.serviceName}
+          <Link href="/">
+            <Wordmark size="sm" showTentative={false} />
           </Link>
         </div>
       </header>

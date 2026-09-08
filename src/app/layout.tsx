@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "./fonts.css";
 import "./globals.css";
 import { COMPANY, displayServiceName } from "@/config/company";
 import { ALLOW_INDEXING, SITE_URL } from "@/lib/site";
@@ -7,8 +8,8 @@ import { ALLOW_INDEXING, SITE_URL } from "@/lib/site";
  * 서비스명은 항상 config/company.ts 를 경유한다 (F-410).
  * 문자열을 직접 쓰지 않는다 — 상호 확정 시 한 곳만 고치면 되도록.
  *
- * 폰트: Pretendard 를 self-host 할 예정이며(T-03 잔여),
- * 파일 추가 전까지는 globals.css 의 시스템 한글 폰트로 대체된다.
+ * 폰트: Pretendard Variable 을 자체 호스팅한다 (fonts.css).
+ * dynamic subset 이라 브라우저가 쓰인 문자 구간만 받는다.
  */
 export const metadata: Metadata = {
   title: {

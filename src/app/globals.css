@@ -1,35 +1,59 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────────────────────
-   디자인 토큰 — TECH_SPEC §8.1
-   회색 스케일 중심 + 포인트 1색. 테두리보다 여백·배경으로 구분.
-   MVP는 라이트 테마로 확정한다 (다크는 Phase 5에서 검토).
+   디자인 토큰 — DESIGN.md
+   회색 스케일 중심 + 포인트 1색. 테두리보다 여백·면 색으로 구분.
+   MVP 는 라이트 테마로 확정한다 (다크는 Phase 5 검토).
    ───────────────────────────────────────────────────────────── */
 @theme {
-  /* 색 */
+  /* ── 색 ──────────────────────────────────────────────────────
+     브랜드색은 청록이다. 이유가 둘 겹친다.
+       1) 청룡언월도의 '청' — 로고와 색이 같은 출처를 갖는다
+       2) 한국 시세는 상승=빨강, 하락=파랑이다. 그 둘은 시세 의미에
+          예약해야 하므로 브랜드색으로 쓸 수 없다. 청록은 한국 시세
+          표기에서 비어 있는 자리라 의미 충돌이 없다
+     ────────────────────────────────────────────────────────── */
   --color-canvas: #ffffff;
-  --color-surface: #f9fafb;
-  --color-line: #e5e8eb;
-  --color-ink: #191f28;
-  --color-ink-sub: #8b95a1;
-  --color-brand: #3182f6;
-  --color-brand-soft: #ebf3fe;
-  --color-danger: #f04452;
+  --color-surface: #f2f5f4;
+  --color-line: #e0e6e4;
+  --color-ink: #15201f;
+  --color-ink-sub: #64726f;
+  --color-brand: #0f6e63;
+  --color-brand-strong: #0b5a51; /* 주요 버튼 hover */
+  --color-brand-soft: #e4f0ee;
+  --color-blade: #3fa79a; /* 로고 날 하이라이트 — 로고 전용 */
+  --color-danger: #c0392f;
 
-  /* 타이포 — 본문은 15px 아래로 내리지 않는다 */
+  /* 개발 모드 경고 배너 */
+  --color-warn: #f0c14b;
+  --color-warn-soft: #fff8e1;
+  --color-warn-ink: #7a5c00;
+
+  /* ── 예약: Phase 2 이후 시세 표기용. UI 크롬에 쓰지 않는다 ── */
+  --color-up: #e02b3c; /* 상승 (한국 관례) */
+  --color-down: #1b64c8; /* 하락 */
+
+  /* ── 타이포 — 본문은 15px 아래로 내리지 않는다 ────────────── */
+  --text-display: 26px;
+  --text-display--line-height: 1.35;
+  --text-post: 22px;
+  --text-post--line-height: 1.4;
   --text-title: 20px;
   --text-title--line-height: 1.4;
   --text-body: 16px;
-  --text-body--line-height: 1.7;
+  --text-body--line-height: 1.75;
   --text-list: 15px;
   --text-list--line-height: 1.5;
   --text-meta: 13px;
   --text-meta--line-height: 1.4;
+  --text-fine: 12px;
+  --text-fine--line-height: 1.7;
 
-  /* 형태 */
+  /* ── 형태 ─────────────────────────────────────────────────── */
   --radius-sm: 8px;
   --radius-md: 12px;
 
+  /* Pretendard 는 src/app/fonts.css 에서 자체 호스팅한다 */
   --font-sans: "Pretendard Variable", Pretendard, -apple-system,
     BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Malgun Gothic",
     sans-serif;
@@ -40,7 +64,7 @@
 }
 
 html {
-  /* iOS에서 가로 스크롤 방지 */
+  /* iOS 에서 가로 스크롤 방지 */
   overflow-x: hidden;
 }
 
@@ -52,7 +76,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* 터치 타겟 최소 44px 확보용 유틸 */
+/* 터치 타겟 최소 44px 확보용 */
 @utility tap {
   min-height: 44px;
   min-width: 44px;
@@ -61,9 +85,18 @@ body {
 /* 짧은 사용자 텍스트 (댓글) — 마크다운을 적용하지 않는 곳 */
 @utility prose-post {
   font-size: var(--text-body);
-  line-height: 1.7;
+  line-height: 1.75;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+/*
+ * 숫자 자리를 고정한다. 조회수·댓글 수·시세가 목록에서 세로로 정렬돼야
+ * 정돈되어 보인다. 비례 숫자는 자리가 흔들린다.
+ */
+@utility nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -144,6 +177,7 @@ body {
   overflow-x: auto;
   border-collapse: collapse;
   font-size: var(--text-list);
+  font-variant-numeric: tabular-nums;
 }
 .post-body th,
 .post-body td {

@@ -18,7 +18,7 @@ export async function DevAuthBanner() {
   return (
     <div
       role="status"
-      className="border-b border-[#f0c14b] bg-[#fff8e1] px-4 py-2.5 text-center text-[12px] leading-relaxed text-[#7a5c00] lg:px-6"
+      className="border-b border-warn bg-warn-soft px-4 py-2.5 text-center text-fine text-warn-ink lg:px-6"
     >
       <b className="font-bold">개발 모드</b> 이메일 인증 없이 가입됩니다.
       정식 오픈 전에 Supabase 에서 <b className="font-bold">Confirm email</b> 을
