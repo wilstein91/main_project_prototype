@@ -535,7 +535,18 @@ update public.profiles set nickname = '운영자' where nickname like '회원%';
 update public.profiles set role = 'admin' where nickname = '운영자';
 ```
 
-### 5.3 이미 만든 계정의 비밀번호를 잊었을 때
+### 5.3 이메일(로그인 ID)을 잘못 넣었을 때
+
+이메일은 로그인 ID 로만 쓰이고 실제 수신은 하지 않으므로 기능상 문제는
+없다. 그래도 바꾸려면 [`supabase/change_admin_email.sql`](supabase/change_admin_email.sql)
+을 SQL Editor 에 붙여넣고 `v_new_email` 만 바꿔 Run 한다.
+
+- `role = 'admin'` 계정을 찾아 바꾸므로 기존 이메일을 몰라도 된다
+- 인증 상태를 유지하므로 바꾼 뒤에도 메일 없이 로그인된다
+- `auth.identities` 의 이메일도 함께 맞춘다 (안 맞추면 로그인 조회가 어긋난다)
+- 비밀번호도 같이 바꾸려면 `v_new_password` 에 값을 넣는다
+
+### 5.4 이미 만든 계정의 비밀번호를 잊었을 때
 
 방법 A 의 스크립트를 같은 이메일로 다시 돌리면 비밀번호가 재설정된다.
 메일은 필요 없다.
