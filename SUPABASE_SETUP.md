@@ -145,12 +145,11 @@ https://<ref>.supabase.co
 
 ### ② 공개 키 — 링크 하나로 바로 간다
 
-아래 주소를 브라우저에 붙여넣는다. `_` 는 "지금 보고 있는 프로젝트" 를
-뜻하므로 ref 를 몰라도 열린다.
+→ [API 키 화면 열기](https://supabase.com/dashboard/project/suoaovdanimacisbocuk/settings/api-keys)
 
-```
-https://supabase.com/dashboard/project/_/settings/api-keys
-```
+(ref 를 모르는 다른 프로젝트라면 `_` 를 넣은 주소로도 열린다 —
+`https://supabase.com/dashboard/project/_/settings/api-keys`. `_` 는
+"지금 보고 있는 프로젝트" 를 뜻한다.)
 
 열리는 화면에서:
 
@@ -512,11 +511,7 @@ v_nickname text := '운영자';
 
 SQL 이 부담스러우면 이쪽도 된다. **5.0 을 먼저 적용해야 한다.**
 
-1. 아래 주소를 브라우저에 붙여넣는다 (이 프로젝트 전용 주소다)
-
-```
-https://supabase.com/dashboard/project/suoaovdanimacisbocuk/auth/users
-```
+1. → [회원 목록(Users) 열기](https://supabase.com/dashboard/project/suoaovdanimacisbocuk/auth/users)
 
 2. 오른쪽 위 **`Add user`** → **`Create new user`**
 3. 이메일과 비밀번호를 넣고 **`Auto Confirm User`** 를 **켠다**

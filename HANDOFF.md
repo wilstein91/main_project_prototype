@@ -52,9 +52,7 @@ C:\Aiffel_Work\Main_Project 이어서 작업할게. HANDOFF.md 읽고 시작해.
 
 사용자에게 안내할 것 — SQL 에디터는 이 주소로 바로 열린다:
 
-```
-https://supabase.com/dashboard/project/suoaovdanimacisbocuk/sql/new
-```
+→ [SQL 에디터 새 쿼리 열기](https://supabase.com/dashboard/project/suoaovdanimacisbocuk/sql/new)
 
 두 파일 내용을 붙여넣고 Run. 확인 방법: 마지막 표에서
 `anon 실행권한 = false`, `회원 실행권한 = true`.
@@ -135,6 +133,11 @@ Phase 1 v1.0 마감 전에 프로덕션을 직접 찔러 점검했다. **셋 다
    방법" 한 줄.
 7. 진행 상황을 부풀리지 않는다. 이번 세션에서 "화면이 있으니 완료" 로
    세다가 누락 4건을 놓쳤고, 지적받았다.
+8. **사용자가 눌러야 하는 주소는 마크다운 링크로 준다.** 코드블록(```)
+   안에 넣으면 클릭이 안 된다. 이걸로 한 번 막혔다 — 주소는 맞았는데
+   "링크가 하나도 안 열린다" 는 답이 돌아왔다.
+   코드블록은 **붙여넣을 것**(SQL·명령어)에만 쓴다. 예시로 보여주는
+   주소(주소창 설명, `<ref>` 같은 템플릿)는 코드블록이 맞다.
 
 ---
 

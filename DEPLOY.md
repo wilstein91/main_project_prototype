@@ -45,7 +45,7 @@ Vercel 계정 생성과 로그인은 직접 하셔야 한다. 그 외에 필요�
 **Deploy** 를 누르면 2~3분 뒤 주소가 나온다.
 
 ```
-https://main-project-prototype.vercel.app
+https://namjosunhero.vercel.app
 ```
 
 (정확한 주소는 Vercel 이 알려준다. 프로젝트명에 따라 조금 다를 수 있다)
@@ -71,9 +71,7 @@ Vercel 프로젝트 → **Settings → Environment Variables** 에서 추가/수
 
 ### 4-2. Supabase URL 설정
 
-```
-https://supabase.com/dashboard/project/suoaovdanimacisbocuk/auth/url-configuration
-```
+→ [Supabase 인증 URL 설정 열기](https://supabase.com/dashboard/project/suoaovdanimacisbocuk/auth/url-configuration)
 
 - **Site URL**: `https://<배포주소>`
 - **Redirect URLs** 에 **두 개 추가** (기존 localhost 항목은 그대로 둔다)
