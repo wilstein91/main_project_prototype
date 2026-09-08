@@ -36,7 +36,7 @@
 
 1. 왼쪽 사이드바 **SQL Editor**
 2. **New query**
-3. [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql) 파일을 열어
+3. [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql) 을 열어
    **전체 선택 → 복사 → 붙여넣기**
 4. **Run** (또는 `Ctrl+Enter`)
 5. `Success. No rows returned` 이 나오면 정상
@@ -45,88 +45,184 @@
 
 - 테이블 5개 (`profiles` `categories` `posts` `comments` `audit_logs`)
 - 카테고리 시드 5건 (공지·자유·종목·시황·질문)
-- 함수 4개 (`is_admin` `is_nickname_available` `increment_view_count` `handle_new_user`)
-- 트리거 4개 (프로필 자동 생성, 댓글 수 동기화, 대댓글 깊이 제한)
-- **모든 테이블 RLS 활성화 + 정책 13개**
+- 함수 6개, 트리거 3개, **RLS 정책 14개** (모든 테이블 RLS 활성화)
 
-**확인**: 사이드바 **Table Editor** → 테이블 5개가 보이고, 각 테이블 이름 옆에
-`RLS enabled` 표시가 있으면 정상이다.
+### 2.1 `already exists` 에러가 났다면
+
+```
+ERROR: 42P07: relation "profiles" already exists
+```
+
+**이건 정상 신호다.** 앞선 실행이 이미 성공해서 테이블이 만들어져 있다는 뜻이고,
+같은 스크립트를 두 번 돌리면 나오는 에러다. **아무 조치도 필요 없다.**
+
+단, 첫 실행이 *끝까지* 갔는지는 확인해야 한다. 중간에 끊겼으면 테이블은 있는데
+정책이나 트리거가 빠진 상태가 된다.
+
+**확인 방법** — SQL Editor 에 [`supabase/verify.sql`](supabase/verify.sql) 을
+붙여넣고 Run 한다. 읽기만 하므로 몇 번 돌려도 안전하다.
+
+기대하는 결과:
+
+| 쿼리 | 기대 |
+|---|---|
+| [1] | 15행 전부 `✅ 있음` |
+| [2] | `rls_켜짐` 전부 `true`. 정책수 — profiles 2 / categories 2 / posts 4 / comments 4 / audit_logs 2 |
+| [3] | 5행 (notice·free·stock·market·qna). `notice` 만 `admin` |
+
+전부 맞으면 **2번 단계는 끝났다.** §3 으로 넘어간다.
+
+**하나라도 `❌ 없음` 이면** — 첫 실행이 중간에 끊긴 것이다. 지우고 다시 한다.
+
+1. [`supabase/reset_dev.sql`](supabase/reset_dev.sql) 을 붙여넣고 Run
+   (⚠️ 게시글·프로필이 전부 삭제된다. 회원 데이터가 생긴 뒤에는 실행 금지)
+2. `0001_init.sql` 을 다시 붙여넣고 Run
+3. `verify.sql` 로 재확인
 
 ---
 
 ## 3. 환경변수 채우기
 
-가져올 값은 **두 개**뿐이다. 두 가지 방법이 있고, **3-A 가 더 빠르고 확실하다.**
+가져올 값은 **딱 두 개**다.
 
-| 넣을 곳 | 무엇 | 형태 |
+| # | 이름 | 생김새 |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | 프로젝트 URL | `https://xxxxxxxx.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | 공개 키 | `sb_publishable_...` |
+| ① | 프로젝트 주소 | `https://abcdefghijklmnop.supabase.co` |
+| ② | 공개 키 | `sb_publishable_` 로 시작하는 긴 문자열 |
 
-### 3-A. Connect 버튼으로 한 번에 (권장)
+이 두 개를 프로젝트 폴더의 `.env.local` 파일에 적으면 끝이다.
 
-메뉴가 개편되어도 이 버튼은 그대로 있고, 두 값이 한 화면에 나온다.
+### ① 프로젝트 주소 — 브라우저 주소창을 보면 된다
 
-1. 프로젝트 대시보드 **상단 헤더의 `Connect` 버튼** 클릭
-2. 프레임워크 탭에서 **Next.js** 선택
-3. `.env.local` 용 스니펫이 나온다. 아래 두 줄을 복사한다
-   - `NEXT_PUBLIC_SUPABASE_URL=...`
-   - 공개 키 한 줄 (`sb_publishable_...`)
+메뉴를 찾아갈 필요가 없다. **지금 열려 있는 대시보드의 주소창**을 보자.
 
-> 스니펫의 변수 이름이 이 프로젝트와 다를 수 있다 (`..._ANON_KEY` 또는
-> `..._PUBLISHABLE_KEY`). **값만 가져와서** 아래 3-C 의 변수 이름에 붙인다.
-> 두 이름 모두 코드가 읽지만 `PUBLISHABLE` 쪽을 우선한다.
+```
+https://supabase.com/dashboard/project/abcdefghijklmnop
+                                       └──────┬───────┘
+                                         이 부분 = 프로젝트 ref
+```
 
-### 3-B. 설정 화면에서 따로 가져오기
+`project/` 다음에 오는 **20자 정도의 영문 덩어리**가 프로젝트 ref 다.
+그걸 아래 형태에 끼우면 그게 프로젝트 주소다.
 
-Connect 버튼을 못 찾겠으면 두 곳에서 하나씩 가져온다.
+```
+https://<ref>.supabase.co
+```
 
-**프로젝트 URL**
+예를 들어 주소창이 `.../project/abcdefghijklmnop` 이면
+프로젝트 주소는 `https://abcdefghijklmnop.supabase.co` 다.
 
-1. 왼쪽 사이드바 맨 아래 **⚙ Project Settings**
-2. **Data API**
-3. **Project URL** 항목의 값을 복사 (`https://xxxxxxxx.supabase.co`)
+> `/settings/...` 처럼 뒤에 더 붙어 있어도 상관없다. `project/` 바로 뒤
+> 한 덩어리만 쓴다.
 
-**공개 키**
+### ② 공개 키 — 링크 하나로 바로 간다
 
-1. **⚙ Project Settings** → **API Keys**
-2. **`Publishable and secret API keys` 탭** 선택
-3. **Publishable key** 의 값을 복사 (`sb_publishable_...`)
+아래 주소를 브라우저에 붙여넣는다. `_` 는 "지금 보고 있는 프로젝트" 를
+뜻하므로 ref 를 몰라도 열린다.
 
-> 같은 화면의 **Secret keys** (`sb_secret_...`) 는 **복사하지 않는다.**
-> 이 프로젝트는 쓰지 않으며, 이 키 하나로 RLS 가 통째로 우회된다.
-> 실수로 어딘가에 붙여 넣었다면 같은 화면에서 즉시 **Revoke** 후 재발급할 것 (§10.1).
->
-> `Legacy API keys` 탭의 `anon` / `service_role` 은 폐기 예정이므로 신규
-> 프로젝트에서는 쓰지 않는다.
+```
+https://supabase.com/dashboard/project/_/settings/api-keys
+```
 
-### 3-C. 파일에 넣기
+열리는 화면에서:
 
-프로젝트 폴더에서:
+1. 탭이 두 개 보인다 — **`Publishable and secret API keys`** 와 `Legacy API keys`
+2. **`Publishable and secret API keys`** 탭을 선택한다 (보통 기본 선택)
+3. **`Publishable key`** 라고 적힌 항목을 찾는다. 값이 `sb_publishable_...` 로 시작한다
+4. 값 옆의 **복사 아이콘**을 누른다
+
+**이 화면에서 가져오지 말아야 할 것:**
+
+| 항목 | |
+|---|---|
+| `Secret keys` (`sb_secret_...`) | ❌ 쓰지 않는다. 이 키 하나로 RLS 가 통째로 우회된다 |
+| `Legacy API keys` 탭의 `anon` | ❌ 2026년 말 폐기 예정 |
+| `Legacy API keys` 탭의 `service_role` | ❌ 절대 |
+
+> 실수로 Secret 키를 어딘가에 붙여 넣었다면 같은 화면에서 **Revoke** 하고
+> 새로 발급받는다 (§10.1).
+
+### ②-대안: `Connect` 버튼 (두 값을 한 번에)
+
+위 링크가 안 열리거나 화면이 다르면 이쪽을 쓴다.
+
+1. 프로젝트 대시보드 **맨 위 헤더의 `Connect` 버튼** 클릭
+2. 프레임워크 목록에서 **Next.js** 선택
+3. `.env.local` 용 코드 블록이 나온다 — **프로젝트 주소와 공개 키가 함께** 들어 있다
+
+> 여기 나오는 변수 **이름**은 이 프로젝트와 다를 수 있다
+> (`..._ANON_KEY` 로 나올 수도 있다). **`=` 뒤의 값만** 가져와서
+> 아래 ③ 의 이름에 붙인다.
+
+### ③ `.env.local` 에 적기
+
+프로젝트 폴더(`C:\Aiffel_Work\Main_Project`)에서:
 
 ```bash
 cp .env.local.example .env.local
 ```
 
-`.env.local` 을 열어 **`=` 뒤에만** 값을 붙인다. 따옴표·공백 없이.
+`.env.local` 을 편집기로 열면 아래 세 줄이 있다 (주석 사이에 섞여 있다).
+**`=` 뒤에만** 값을 붙인다.
 
 ```env
 NEXT_PUBLIC_SITE_URL=http://localhost:3200
-NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxx.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxxxxxxxxxxxxxxxxxxx
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 ```
 
-### 3-D. 반영
+채우면 이렇게 된다:
 
-**개발 서버를 반드시 재시작한다.** `.env.local` 은 기동 시점에만 읽힌다.
+```env
+NEXT_PUBLIC_SITE_URL=http://localhost:3200
+NEXT_PUBLIC_SUPABASE_URL=https://abcdefghijklmnop.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_A1b2C3d4E5f6G7h8I9j0
+```
+
+**주의 4가지**
+
+- 따옴표를 붙이지 않는다 (`"https://..."` ❌)
+- `=` 앞뒤에 공백을 넣지 않는다
+- 줄 맨 앞에 `#` 이 있으면 지운다 (주석 처리되어 무시된다)
+- 값 끝에 공백이나 줄바꿈이 섞이지 않게 한다
+
+### ④ 개발 서버 재시작
+
+`.env.local` 은 **서버가 켜질 때 한 번만** 읽힌다. 저장만 해서는 반영되지 않는다.
+
+실행 중인 개발 서버를 끄고(`Ctrl+C`) 다시 켠다.
 
 ```bash
 npm run dev
 ```
 
-**확인**: `/signup` 에서 `데이터베이스 미연결` 안내가 사라지면 성공이다.
-안 사라졌다면 — 서버를 재시작했는지, `=` 뒤에 값이 실제로 들어갔는지,
-변수 이름 앞의 `#` 을 지웠는지 확인한다.
+### ⑤ 됐는지 확인
+
+브라우저에서 `http://localhost:3200/signup` 을 연다.
+
+| 보이는 것 | 뜻 |
+|---|---|
+| `데이터베이스 미연결` 안내가 **사라졌다** | ✅ 성공. §4 로 넘어간다 |
+| 안내가 그대로 있다 | ❌ 아래 확인 |
+
+안 되면 순서대로 확인한다.
+
+1. 개발 서버를 정말 끄고 다시 켰는가
+2. 파일 이름이 `.env.local` 인가 (`.env.local.example` 이 아니라)
+3. 두 줄 맨 앞에 `#` 이 남아 있지 않은가
+4. `=` 뒤에 값이 실제로 붙어 있는가 — 주석을 걷어내고 확인한다
+
+```bash
+grep -v "^#" .env.local | grep .
+```
+
+세 줄이 나오고 **모두 `=` 뒤에 값이 있어야** 한다. 아래처럼 나오면 아직 안 채운 것이다.
+
+```
+NEXT_PUBLIC_SITE_URL=http://localhost:3200
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+```
 
 > `.env.local` 은 `.gitignore` 의 `.env*` 규칙으로 커밋되지 않는다.
 > `.env.local.example` 만 예외로 추적된다.
@@ -309,7 +405,8 @@ npx supabase gen types typescript --project-id <프로젝트-ref> > src/types/da
 | 메일 링크를 누르면 `인증 링크가 만료되었거나 올바르지 않습니다` | §4.3 Redirect URLs 에 `/auth/callback` 미등록, 또는 `NEXT_PUBLIC_SITE_URL` 과 Site URL 불일치 |
 | 글 작성 시 `권한이 없습니다` | 이메일 인증 미완료, 또는 공지 카테고리에 일반 계정으로 작성 시도 |
 | 로그인이 자꾸 풀린다 | `proxy.ts` 가 동작하지 않는 상태. 빌드 출력에 `ƒ Proxy (Middleware)` 가 있는지 확인 |
-| `Invalid API key` | Secret 키를 넣었거나 키 값이 잘린 상태. §3-A 로 다시 복사 |
+| `Invalid API key` | Secret 키를 넣었거나 키 값이 잘린 상태. §3-② 로 다시 복사 |
+| SQL 실행 시 `already exists` | 이미 적용된 것. §2.1 로 확인만 하면 된다 |
 
 ## 배포 전 남은 것
 
