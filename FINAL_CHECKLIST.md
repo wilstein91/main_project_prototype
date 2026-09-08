@@ -237,7 +237,26 @@ npm run build         # 프로덕션 빌드
 
 ### D-3. 개발용 계정·코드 정리
 
-- [ ] 테스트 회원 삭제 — `supabase/drop_test_member.sql`
+시드 계정 7개가 실제 DB 에 있다. 전부 `@namjosunhero.local` 이라 실제
+메일이 가지 않는 주소이고, 목록 디자인을 판단할 재료로 만든 것이다.
+
+| 계정 | 닉네임 | 비밀번호 | 용도 |
+|---|---|---|---|
+| `tester@namjosunhero.local` | 테스트회원 | `TestMember-2026!` | RLS 통합 테스트가 로그인해서 쓴다 |
+| `seed.kangnam@…` | 강남불패 | `SeedMember-2026!` | 시드 글 작성자 |
+| `seed.jonber@…` | 존버중입니다 | 〃 | 〃 |
+| `seed.semicon@…` | 반도체구경꾼 | 〃 | 〃 |
+| `seed.dividend@…` | 배당모으기 | 〃 | 〃 |
+| `seed.newbie@…` | 이제막시작 | 〃 | 〃 |
+| `seed.chart@…` | 차트만보는사람 | 〃 | 〃 |
+
+`tester` 를 지우면 RLS 통합 테스트가 건너뛰어진다 (`hasMember` 가
+false). **지우는 순서는 테스트를 마지막으로 돌린 뒤**다.
+
+- [ ] 시드 글 26건 + 댓글 삭제 (제목이 투자 주제인 글들)
+- [ ] 시드 계정 6개 삭제
+- [ ] 테스트 회원 삭제 — `supabase/drop_test_member.sql` (테스트 마지막 실행 후)
+- [ ] `supabase/dev_seed_views.sql` 로 넣은 조회수는 글과 함께 사라진다
 - [ ] 검증용 글·댓글 삭제
 - [ ] 시드 코드 제거 (`SUPABASE_SETUP.md` §8)
       ```bash

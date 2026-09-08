@@ -4,7 +4,8 @@
 
 | 문서 | 용도 |
 |---|---|
-| [WORK_UNITS.md](WORK_UNITS.md) | **지금 어디까지 왔는가** ← 진행 상황은 여기 |
+| [HANDOFF.md](HANDOFF.md) | **새 세션은 여기부터** ← 현재 상태·다음 할 일·함정 |
+| [WORK_UNITS.md](WORK_UNITS.md) | 티켓별 구현·검증 근거 |
 | [PHASES.md](PHASES.md) | 페이즈별 할 일 (Phase 0~5) |
 | [DESIGN.md](DESIGN.md) | 디자인 방향 — 로고·색·타이포·톤 |
 | [FINAL_CHECKLIST.md](FINAL_CHECKLIST.md) | **오픈 전 최종 관문** (기능·비정상 접근·보안) |
