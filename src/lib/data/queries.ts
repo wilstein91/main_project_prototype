@@ -26,7 +26,6 @@ export const getCategoryBySlug = provider.getCategoryBySlug;
 export const getPosts = provider.getPosts;
 export const getPost = provider.getPost;
 export const getCommentTree = provider.getCommentTree;
-export const incrementViewCount = provider.incrementViewCount;
 
 export { POSTS_PER_PAGE } from "./types";
 export type { PostsQuery, PostsResult } from "./types";

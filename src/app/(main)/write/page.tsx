@@ -1,6 +1,7 @@
 import { PostForm } from "@/components/post/PostForm";
 import { PendingNotice } from "@/components/ui/PendingNotice";
 import { getCategories, isSeedMode } from "@/lib/data/queries";
+import { getViewer } from "@/lib/session";
 
 export const metadata = { title: "글쓰기" };
 
@@ -10,14 +11,18 @@ export const metadata = { title: "글쓰기" };
  */
 export default async function WritePage({ searchParams }: PageProps<"/write">) {
   const { category } = await searchParams;
-  const categories = await getCategories();
+  const [categories, viewer] = await Promise.all([getCategories(), getViewer()]);
   const preset = typeof category === "string" ? category : undefined;
 
   return (
     <div className="px-4 py-5 lg:px-0 lg:py-0">
       <h1 className="mb-4 text-title font-bold text-ink">글쓰기</h1>
       {isSeedMode() && <PendingNotice ticket="Supabase 연결" />}
-      <PostForm categories={categories} presetSlug={preset} />
+      <PostForm
+        categories={categories}
+        presetSlug={preset}
+        isAdmin={viewer?.role === "admin"}
+      />
     </div>
   );
 }

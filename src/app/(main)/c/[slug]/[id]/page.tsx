@@ -2,12 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CommentList } from "@/components/comment/CommentList";
 import { PostBody } from "@/components/post/PostBody";
+import { ViewCounter } from "@/components/post/ViewCounter";
 import { ButtonLink } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { DeleteForm } from "@/components/ui/DeleteForm";
 import { POST_DISCLAIMER } from "@/config/legal";
 import { deletePostAction } from "@/lib/actions/post";
-import { getCommentTree, getPost, incrementViewCount } from "@/lib/data/queries";
+import { getCommentTree, getPost } from "@/lib/data/queries";
 import { getViewer } from "@/lib/session";
 import { formatCount, formatFullDate } from "@/lib/utils/date";
 
@@ -40,15 +41,14 @@ export default async function PostDetailPage({
     getViewer(),
   ]);
 
-  // 조회수 (F-208). 실패해도 페이지가 깨지지 않게 던지지 않는다.
-  // 세션 단위 중복 방지는 미적용 — 알려진 한계다 (TECH_SPEC §9.2).
-  await incrementViewCount(post.id);
-
   const isMine = viewer?.id === post.author_id;
   const isAdmin = viewer?.role === "admin";
 
   return (
     <article className="lg:rounded-[var(--radius-md)] lg:border lg:border-line lg:bg-canvas">
+      {/* 조회수 (F-208) — 쿠키로 같은 방문자의 재조회를 걸러낸다 */}
+      <ViewCounter postId={post.id} />
+
       <header className="border-b border-line px-4 py-5 lg:px-5">
         <div className="mb-2 flex items-center gap-2">
           <Link

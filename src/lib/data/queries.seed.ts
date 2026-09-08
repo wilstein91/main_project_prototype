@@ -114,15 +114,10 @@ async function getCommentTree(postId: number): Promise<CommentNode[]> {
   return roots;
 }
 
-async function incrementViewCount(): Promise<void> {
-  // 시드는 읽기 전용이다.
-}
-
 export const seedProvider: QueryProvider = {
   getCategories,
   getCategoryBySlug,
   getPosts,
   getPost,
   getCommentTree,
-  incrementViewCount,
 };

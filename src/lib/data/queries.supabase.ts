@@ -206,18 +206,10 @@ async function getCommentTree(postId: number): Promise<CommentNode[]> {
   return roots;
 }
 
-async function incrementViewCount(postId: number): Promise<void> {
-  const supabase = await createClient();
-  // RLS 의 update 정책을 우회해야 하므로 SECURITY DEFINER 함수를 쓴다.
-  // 조회수 증가 실패로 상세 페이지가 깨지지 않도록 오류는 던지지 않는다.
-  await supabase.rpc("increment_view_count", { p_post_id: postId });
-}
-
 export const supabaseProvider: QueryProvider = {
   getCategories,
   getCategoryBySlug,
   getPosts,
   getPost,
   getCommentTree,
-  incrementViewCount,
 };

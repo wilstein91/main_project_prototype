@@ -34,6 +34,4 @@ export interface QueryProvider {
   getPosts(q?: PostsQuery): Promise<PostsResult>;
   getPost(id: number): Promise<PostDetail | null>;
   getCommentTree(postId: number): Promise<CommentNode[]>;
-  /** 상세 진입 시 조회수 증가. 시드 구현에서는 아무 일도 하지 않는다. */
-  incrementViewCount(postId: number): Promise<void>;
 }

@@ -59,6 +59,11 @@ export const updatePasswordSchema = z.object({ password: passwordSchema });
 
 export const updateNicknameSchema = z.object({ nickname: nicknameSchema });
 
+/** 체크박스는 체크됐을 때만 "on" 으로 넘어온다 */
+const checkbox = z
+  .union([z.literal("on"), z.undefined()])
+  .transform((v) => v === "on");
+
 export const postSchema = z.object({
   categoryId: z.coerce.number().int().positive("카테고리를 선택하세요."),
   title: z
@@ -71,6 +76,8 @@ export const postSchema = z.object({
     .trim()
     .min(1, "내용을 입력하세요.")
     .max(20000, "본문은 20,000자 이하여야 합니다."),
+  /** 관리자만 켤 수 있다. 최종 판정은 RLS (0003 마이그레이션) */
+  isPinned: checkbox,
 });
 
 export const postUpdateSchema = postSchema.omit({ categoryId: true }).extend({

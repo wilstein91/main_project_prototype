@@ -34,11 +34,14 @@ export default async function EditPostPage({
       <h1 className="mb-4 text-title font-bold text-ink">글 수정</h1>
       <PostForm
         categories={categories}
+        isAdmin={viewer.role === "admin"}
         existing={{
           id: post.id,
           title: post.title,
           content: post.content,
           categorySlug: post.category_slug,
+          categoryName: post.category_name,
+          isPinned: post.is_pinned,
         }}
       />
     </div>
