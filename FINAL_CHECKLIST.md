@@ -152,9 +152,10 @@ npm run build         # 프로덕션 빌드
 실제로 0005 에서 이 실수를 했다. 함수 안 권한 검사가 막아 주고 있었지만,
 의도한 방어 한 겹이 조용히 빠진 상태였다 (0006 에서 수정).
 
-- [ ] SECURITY DEFINER 함수마다 **역할 이름을 적어** 회수했다
-      (`revoke ... from anon`, PUBLIC 회수와 별개로)
-- [ ] 판정 쿼리로 확인했다 — anon `실행 차단`, authenticated `실행 가능`
+- [x] SECURITY DEFINER 함수마다 **역할 이름을 적어** 회수했다
+      (`revoke ... from anon`, PUBLIC 회수와 별개로) — 0006, 2026-09-09
+- [x] 판정 쿼리로 확인했다 — anon `실행 차단`, authenticated `실행 가능`
+      실동작도 확인: 비회원 호출 → `permission denied for function`
       ```sql
       select r.rolname as 역할,
              case when has_function_privilege(r.rolname, 'public.<함수>(<인자>)', 'execute')
