@@ -1,4 +1,4 @@
-import { BladeCrest } from "@/components/brand/BladeCrest";
+import { LogoLockup } from "@/components/brand/LogoLockup";
 import { ButtonLink } from "@/components/ui/Button";
 import { COMPANY, displayServiceName } from "@/config/company";
 
@@ -37,16 +37,13 @@ export default function AboutPage() {
        * 이라는 이름의 출처를 설명하는데, 그 설명과 마크가 같은 자리에
        * 있어야 로고가 장식이 아니라 뜻으로 읽힌다 (DESIGN.md §3.3).
        */}
-      <header className="mb-8 flex items-center gap-5 rounded-[var(--radius-md)] bg-brand-soft px-5 py-6 lg:gap-7 lg:px-7">
-        <BladeCrest size={116} className="shrink-0" />
-        <div className="min-w-0">
-          <h1 className="text-[26px] font-black leading-snug tracking-[-0.02em] text-ink">
-            {COMPANY.serviceName}
-          </h1>
-          <p className="mt-1.5 text-list leading-relaxed text-ink-sub">
-            {COMPANY.tagline}
-          </p>
-        </div>
+      <header className="mb-8 rounded-[var(--radius-md)] bg-brand-soft px-5 py-6 lg:px-7 lg:py-8">
+        <h1>
+          <LogoLockup className="w-[300px] max-w-full sm:w-[400px] lg:w-[470px]" />
+        </h1>
+        <p className="mt-3 text-list leading-relaxed text-ink-sub">
+          {COMPANY.tagline}
+        </p>
       </header>
 
       <section className="mb-10 flex flex-col gap-4 text-body leading-[1.75] text-ink">

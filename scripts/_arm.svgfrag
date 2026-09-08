@@ -1,0 +1,46 @@
+
+  <!-- ═══ 자루 ═══ 소켓에서 오른쪽 아래로, 글자 뒤를 지나 끝까지 -->
+  <path d="M286 146 L868 200" stroke="#15201f" stroke-width="18" stroke-linecap="round"/>
+  <path d="M296 143 L858 194" stroke="#3d4f4c" stroke-width="4.5" stroke-linecap="round"/>
+  <g stroke="#c8922a" stroke-width="18" stroke-linecap="butt">
+    <path d="M470 163 L488 164.7"/>
+    <path d="M556 171 L574 172.7"/>
+    <path d="M642 179 L660 180.7"/>
+    <path d="M728 187 L746 188.7"/>
+  </g>
+  <path d="M848 197 L872 200" stroke="#c8922a" stroke-width="21" stroke-linecap="round"/>
+  <path d="M850 194 L868 195" stroke="#f0d288" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- ═══ 날 ═══ 두 원호 사이 = 초승달. 베지에로는 렌즈가 되어 잎사귀로 읽힌다 -->
+  <path d="M34 22 A168 168 0 0 0 274 128 A700 700 0 0 1 34 22 Z"
+        fill="#0f6e63" stroke="#15201f" stroke-width="8" stroke-linejoin="round"/>
+  <!-- 등 쪽 하이라이트: 같은 구성으로 한 겹 안쪽에 -->
+  <path d="M58 34 A166 166 0 0 0 258 120 A620 620 0 0 1 58 34 Z"
+        fill="#3fa79a"/>
+  <path d="M50 28 A170 170 0 0 0 140 66 A260 260 0 0 1 50 28 Z"
+        fill="#9adfd4"/>
+  <!-- 조각 문양 힌트 — 날 곡선을 따라가는 금색 선 -->
+  <path d="M78 40 A230 230 0 0 0 250 112" stroke="#7d5610" stroke-width="3.5"
+        fill="none" opacity=".45" stroke-linecap="round"/>
+
+  <!-- ═══ 등날 갈고리 ═══ -->
+  <path d="M280 126 C290 104 312 94 334 102" stroke="#15201f" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- ═══ 용머리 투겁 ═══ -->
+  <path d="M268 154 C288 142 316 138 340 142 C356 145 360 157 348 166
+           C324 176 290 173 270 164 Z"
+        fill="#c8922a" stroke="#15201f" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M276 151 C298 141 322 138 340 142" stroke="#f0d288" stroke-width="5"
+        fill="none" stroke-linecap="round"/>
+  <path d="M310 136 C312 120 325 112 340 114" stroke="#c8922a" stroke-width="8"
+        fill="none" stroke-linecap="round"/>
+  <path d="M310 136 C313 123 323 116 335 117" stroke="#f0d288" stroke-width="3"
+        fill="none" stroke-linecap="round"/>
+  <circle cx="323" cy="153" r="4.8" fill="#15201f"/>
+  <path d="M290 169 L297 163 L304 171 L311 164 L318 172"
+        stroke="#fbfaf5" stroke-width="4.2" fill="none" stroke-linejoin="round"/>
+
+  <!-- ═══ 붉은 술 ═══ -->
+  <circle cx="372" cy="161" r="11" fill="#c0392f" stroke="#15201f" stroke-width="6"/>
+  <path d="M369 172 C361 186 359 202 362 216" stroke="#c0392f" stroke-width="8" stroke-linecap="round"/>
+  <path d="M376 172 C373 186 376 202 381 214" stroke="#8e2018" stroke-width="6" stroke-linecap="round"/>
