@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { hardenAuthCookie } from "./cookie-options";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/types/database";
 import { isSupabaseConfigured, SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "./config";
@@ -42,7 +43,8 @@ export async function updateSession(request: NextRequest) {
           }
           response = NextResponse.next({ request });
           for (const { name, value, options } of cookiesToSet) {
-            response.cookies.set(name, value, options);
+            // httpOnly 를 강제한다 — 이유는 cookie-options.ts
+            response.cookies.set(name, value, hardenAuthCookie(options));
           }
         },
       },

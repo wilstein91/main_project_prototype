@@ -40,7 +40,24 @@ export function safeInternalPath(
     const url = new URL(raw, SENTINEL_ORIGIN);
     // `//evil.com` 처럼 출신이 바뀌면 외부 주소다
     if (url.origin !== SENTINEL_ORIGIN) return fallback;
-    return `${url.pathname}${url.search}${url.hash}`;
+
+    const out = `${url.pathname}${url.search}${url.hash}`;
+
+    /*
+     * 입력 검사만으로는 부족하다. 출력도 검사한다.
+     *
+     * `/..//evil.com` 은 단일 슬래시로 시작하므로 위 검사를 모두 통과하고,
+     * 출신도 internal.invalid 로 유지된다. 그런데 URL 파서가 `/..` 를
+     * 지우면서 **pathname 이 `//evil.com` 이 된다.** 이 값으로 이동하면
+     * 브라우저가 프로토콜 상대 주소로 읽어 외부로 나간다.
+     *
+     * 즉 파싱 전에는 안전해 보이고 파싱 후에 위험해지는 입력이 있다.
+     * 마지막 관문은 결과 문자열이어야 한다.
+     */
+    if (!out.startsWith("/") || out.startsWith("//") || out.startsWith("/\\")) {
+      return fallback;
+    }
+    return out;
   } catch {
     return fallback;
   }

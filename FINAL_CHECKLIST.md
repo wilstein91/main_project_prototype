@@ -157,7 +157,12 @@ npm run build         # 프로덕션 빌드
 ### C-4. 리다이렉트 · CSRF
 
 - [ ] `?redirect=` `?next=` 가 `safeInternalPath()` 를 통과한다
-- [ ] `safe-path.test.ts` 통과 — `//evil.com` `/\evil.com` 제어문자 전부 차단
+- [x] `safe-path.test.ts` + `safe-path.redirect.test.ts` 통과 — 공격 19종 고정
+      (`//evil.com` `/\evil.com` 제어문자 `javascript:` `%2f%2f` 등)
+- [x] **`/..//evil.com` 차단** — 2026-09-09 실제로 뚫렸다. 단일 슬래시로
+      시작해 입력 검사를 통과하는데, URL 파서가 `/..` 를 지우면서
+      pathname 이 `//evil.com` 이 되어 나왔다. **결과 문자열도 검사**하도록
+      고쳤다 (입력만 보면 안 된다)
 - [ ] 리다이렉트를 쓰는 모든 곳이 이 함수를 쓴다
       ```bash
       grep -rn "redirect(" src/lib/actions/ src/lib/auth/ | grep -v safeInternalPath
@@ -174,7 +179,13 @@ npm run build         # 프로덕션 빌드
 - [ ] Rate Limits 확인 (가입·로그인·메일 발송)
 - [ ] 비밀번호 재설정 응답이 계정 존재 여부를 노출하지 않는다
 - [ ] 비밀번호를 직접 저장하지 않는다 (Supabase Auth 위임)
-- [ ] 세션 쿠키가 `httpOnly` · `secure` · `sameSite` 로 설정된다
+- [x] 세션 쿠키가 `httpOnly` · `secure` · `sameSite` 로 설정된다
+      2026-09-09 확인 시 **httpOnly 가 아니었다** — `document.cookie` 로
+      access token 과 refresh token 이 그대로 읽혔다 (XSS 한 번에 계정
+      탈취). `@supabase/ssr` 기본값이 그렇다(브라우저 클라이언트도 읽는
+      구성을 가정). 이 앱은 브라우저에서 Supabase 를 쓰지 않으므로
+      `lib/supabase/cookie-options.ts` 로 강제했다. 회귀 방지 테스트 있음.
+      ⚠️ 브라우저에서 Supabase 를 직접 부르기로 바꾸면 로그인이 깨진다
 - [ ] `proxy.ts` 가 세션을 갱신한다 (빌드 출력 확인)
 - [ ] `/admin` 이 **proxy + 서버 컴포넌트 이중 확인** 을 한다
 
@@ -188,6 +199,12 @@ npm run build         # 프로덕션 빌드
 
 ### C-7. 정보 노출
 
+- [x] **보안 헤더** — 2026-09-09 확인 시 HSTS 하나뿐이었다.
+      `next.config.ts` 에 추가: `X-Frame-Options: DENY`,
+      CSP(`frame-ancestors 'none'; form-action 'self'; base-uri 'self';
+      object-src 'none'`), `X-Content-Type-Options: nosniff`,
+      `Referrer-Policy`, `Permissions-Policy`. `X-Powered-By` 는 제거.
+      CSP `script-src` 는 nonce 배선이 필요해 Phase 2 로 미뤘다
 - [ ] 삭제된 글이 anon·일반 회원 모두에게 안 보인다
 - [ ] `audit_logs` 를 관리자 외에는 못 읽는다
 - [ ] 오류 메시지에 DB 구조·SQL·내부 경로가 없다 (`fromSupabase` 가 변환)

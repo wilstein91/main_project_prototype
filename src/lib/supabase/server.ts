@@ -6,6 +6,7 @@ import {
   SUPABASE_PUBLISHABLE_KEY,
   SUPABASE_URL,
 } from "./config";
+import { hardenAuthCookie } from "./cookie-options";
 
 /**
  * 서버 컴포넌트 / Server Action 용 클라이언트.
@@ -28,7 +29,7 @@ export async function createClient() {
       setAll(cookiesToSet) {
         try {
           for (const { name, value, options } of cookiesToSet) {
-            cookieStore.set(name, value, options);
+            cookieStore.set(name, value, hardenAuthCookie(options));
           }
         } catch {
           // 서버 컴포넌트에서 호출된 경우. proxy.ts 가 갱신을 처리한다.
