@@ -30,8 +30,8 @@ export default async function EditPostPage({
   if (post.author_id !== viewer.id) notFound();
 
   return (
-    <div className="px-4 py-5 lg:px-0 lg:py-0">
-      <h1 className="mb-4 text-title font-bold text-ink">글 수정</h1>
+    <div className="px-4 py-6 lg:px-6 lg:py-0">
+      <h1 className="mb-6 text-title font-bold text-ink">글 수정</h1>
       <PostForm
         categories={categories}
         isAdmin={viewer.role === "admin"}

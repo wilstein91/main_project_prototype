@@ -36,7 +36,7 @@ export default async function CategoryPage({
 
   return (
     <div className="lg:rounded-[var(--radius-md)] lg:border lg:border-line lg:bg-canvas">
-      <div className="flex items-start justify-between gap-3 border-b border-line px-4 py-4 lg:px-5">
+      <div className="flex items-start justify-between gap-3 border-b border-line px-4 py-4 lg:px-6">
         <div className="min-w-0">
           <h1 className="text-title font-bold text-ink">{category.name}</h1>
           {category.description && (
@@ -61,7 +61,7 @@ export default async function CategoryPage({
           title="아직 글이 없습니다"
           description={
             category.write_role === "admin"
-              ? "이 게시판은 운영자만 글을 작성할 수 있습니다."
+              ? "이 게시판에는 운영자만 글을 쓸 수 있습니다."
               : "첫 글을 남겨보세요."
           }
           action={

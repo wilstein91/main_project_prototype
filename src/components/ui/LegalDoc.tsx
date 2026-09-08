@@ -21,7 +21,7 @@ export function LegalDoc({
   footNote?: string;
 }) {
   return (
-    <div className="px-4 py-6 lg:px-0 lg:py-0">
+    <div className="px-4 py-6 lg:px-6 lg:py-0">
       <h1 className="mb-5 text-[24px] font-bold leading-snug text-ink">
         {title}
       </h1>
@@ -58,7 +58,7 @@ export function LegalDoc({
       </div>
 
       {footNote && (
-        <p className="mt-10 border-t border-line pt-5 text-[12px] text-ink-sub">
+        <p className="mt-8 border-t border-line pt-5 text-[12px] text-ink-sub">
           {footNote}
         </p>
       )}

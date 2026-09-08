@@ -32,8 +32,8 @@ export default async function SettingsPage({
   const blockedUntil = blocked ? formatKstDate(blocked) : null;
 
   return (
-    <div className="px-4 py-5 lg:px-0 lg:py-0">
-      <h1 className="mb-4 text-title font-bold text-ink">내 정보</h1>
+    <div className="px-4 py-6 lg:px-6 lg:py-0">
+      <h1 className="mb-6 text-title font-bold text-ink">내 정보</h1>
 
       {isPasswordReset && viewer && (
         <p

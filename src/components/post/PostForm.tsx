@@ -112,7 +112,7 @@ export function PostForm({
       </Field>
 
       {isAdmin && (
-        <label className="flex items-start gap-2.5 rounded-[var(--radius-md)] bg-brand-soft px-4 py-3.5">
+        <label className="flex items-start gap-2.5 rounded-[var(--radius-md)] bg-brand-soft px-4 py-4">
           <input
             type="checkbox"
             name="isPinned"

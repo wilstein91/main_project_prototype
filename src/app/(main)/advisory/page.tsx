@@ -21,7 +21,7 @@ export default function AdvisoryPage() {
   }
 
   return (
-    <div className="px-4 py-6 lg:px-0 lg:py-0">
+    <div className="px-4 py-6 lg:px-6 lg:py-0">
       <h1 className="text-[26px] font-bold text-ink">자문 서비스</h1>
     </div>
   );

@@ -9,18 +9,18 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
     <div className="flex min-h-full flex-col">
       <DevAuthBanner />
       <header className="border-b border-line">
-        <div className="mx-auto flex h-14 max-w-md items-center px-5">
+        <div className="mx-auto flex h-14 max-w-md items-center px-4 lg:px-6">
           <Link href="/">
             <Wordmark size="sm" showTentative={false} />
           </Link>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-md flex-1 px-5 py-8">
+      <main className="mx-auto w-full max-w-md flex-1 px-4 py-8 lg:px-6">
         {children}
       </main>
 
-      <footer className="mx-auto w-full max-w-md px-5 pb-10">
+      <footer className="mx-auto w-full max-w-md px-4 pb-10 lg:px-6">
         <p className="text-[12px] leading-relaxed text-ink-sub">
           {FOOTER_NOTICE.serviceNature}
         </p>

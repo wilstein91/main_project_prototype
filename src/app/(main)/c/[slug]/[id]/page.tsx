@@ -54,13 +54,13 @@ export default async function PostDetailPage({
       {error === "delete" && (
         <p
           role="alert"
-          className="border-b border-line bg-surface px-4 py-3 text-meta text-danger lg:px-5"
+          className="border-b border-line bg-surface px-4 py-3 text-meta text-danger lg:px-6"
         >
           글을 삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.
         </p>
       )}
 
-      <header className="border-b border-line px-4 py-5 lg:px-5">
+      <header className="border-b border-line px-4 py-5 lg:px-6">
         <div className="mb-2 flex items-center gap-2">
           <Link
             href={`/c/${post.category_slug}`}
@@ -90,11 +90,11 @@ export default async function PostDetailPage({
         </div>
 
         {(isMine || isAdmin) && (
-          <div className="mt-3 flex items-center gap-3 text-meta">
+          <div className="-mx-2 mt-3 flex items-center gap-1 text-meta">
             {isMine && (
               <Link
                 href={`/c/${post.category_slug}/${post.id}/edit`}
-                className="font-semibold text-ink-sub hover:text-brand"
+                className="inline-flex items-center px-2 font-semibold text-ink-sub hover:text-brand"
               >
                 수정
               </Link>
@@ -107,13 +107,13 @@ export default async function PostDetailPage({
                   ? "이 글을 삭제할까요?"
                   : "관리자 권한으로 이 글을 삭제합니다. 기록이 남습니다."
               }
-              className="text-meta"
+              className="px-2 text-meta"
             />
           </div>
         )}
       </header>
 
-      <div className="px-4 py-6 lg:px-5">
+      <div className="px-4 py-6 lg:px-6">
         <PostBody content={post.content} />
 
         {/* D-1 작성자 책임 고지 */}
@@ -128,7 +128,7 @@ export default async function PostDetailPage({
         viewer={viewer ? { id: viewer.id, isAdmin } : null}
       />
 
-      <div className="border-t border-line px-4 py-4 lg:px-5">
+      <div className="border-t border-line px-4 py-5 lg:px-6">
         <ButtonLink
           href={`/c/${post.category_slug}`}
           variant="secondary"

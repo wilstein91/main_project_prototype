@@ -31,13 +31,13 @@ const PRINCIPLES = [
 
 export default function AboutPage() {
   return (
-    <div className="px-4 py-6 lg:px-0 lg:py-0">
+    <div className="px-4 py-6 lg:px-6 lg:py-0">
       {/*
        * 이름의 근거를 그림으로 먼저 보여준다. 아래 본문에서 '영웅호걸'
        * 이라는 이름의 출처를 설명하는데, 그 설명과 마크가 같은 자리에
        * 있어야 로고가 장식이 아니라 뜻으로 읽힌다 (DESIGN.md §3.3).
        */}
-      <header className="mb-8 rounded-[var(--radius-md)] bg-brand-soft px-5 py-6 lg:px-7 lg:py-8">
+      <header className="mb-8 rounded-[var(--radius-md)] bg-brand-soft px-6 py-6 lg:px-8 lg:py-8">
         <h1>
           <LogoLockup className="w-[300px] max-w-full sm:w-[400px] lg:w-[470px]" />
         </h1>
@@ -46,7 +46,7 @@ export default function AboutPage() {
         </p>
       </header>
 
-      <section className="mb-10 flex flex-col gap-4 text-body leading-[1.75] text-ink">
+      <section className="mb-8 flex flex-col gap-4 text-body leading-[1.75] text-ink">
         <p>
           {COMPANY.serviceName}은 개인 투자자들이 투자 정보와 의견을 나누는
           커뮤니티입니다. 빠르고 가볍게 읽고 쓸 수 있으면서도, 글이 눈에 편하게
@@ -60,7 +60,7 @@ export default function AboutPage() {
         </p>
       </section>
 
-      <section className="mb-10">
+      <section className="mb-8">
         <h2 className="mb-4 text-title font-bold text-ink">운영 원칙</h2>
         <ul className="flex flex-col gap-3">
           {PRINCIPLES.map((p, i) => (
@@ -78,7 +78,7 @@ export default function AboutPage() {
         </ul>
       </section>
 
-      <section className="mb-10 rounded-[var(--radius-md)] border border-line px-4 py-4">
+      <section className="mb-8 rounded-[var(--radius-md)] border border-line px-4 py-4">
         <h2 className="mb-2 text-list font-bold text-ink">
           현재 운영 상태
         </h2>

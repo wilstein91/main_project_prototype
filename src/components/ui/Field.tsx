@@ -1,7 +1,7 @@
 import type { ComponentProps, ReactNode } from "react";
 
 const inputCls =
-  "h-12 w-full rounded-[var(--radius-sm)] border border-line bg-canvas px-3.5 text-list text-ink outline-none placeholder:text-ink-sub focus:border-brand disabled:bg-surface disabled:text-ink-sub";
+  "h-12 w-full rounded-[var(--radius-sm)] border border-field bg-canvas px-4 text-list text-ink placeholder:text-ink-sub focus:border-brand disabled:bg-surface disabled:text-ink-sub";
 
 export function Field({
   label,
@@ -45,7 +45,7 @@ export function Select({
 export function Textarea({ className, ...rest }: ComponentProps<"textarea">) {
   return (
     <textarea
-      className={`w-full resize-y rounded-[var(--radius-sm)] border border-line bg-canvas px-3.5 py-3 text-body leading-[1.7] text-ink outline-none placeholder:text-ink-sub focus:border-brand disabled:bg-surface disabled:text-ink-sub ${
+      className={`w-full resize-y rounded-[var(--radius-sm)] border border-field bg-canvas px-4 py-3 text-body leading-[1.7] text-ink placeholder:text-ink-sub focus:border-brand disabled:bg-surface disabled:text-ink-sub ${
         className ?? ""
       }`}
       {...rest}

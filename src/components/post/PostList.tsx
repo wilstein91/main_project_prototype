@@ -39,7 +39,7 @@ export function PostList({
         <li key={p.id}>
           <Link
             href={`/c/${p.category_slug}/${p.id}`}
-            className="flex items-start gap-3 px-4 py-3.5 transition-colors hover:bg-surface lg:gap-4 lg:px-5 lg:py-4"
+            className="flex items-start gap-3 px-4 py-4 transition-colors hover:bg-surface lg:gap-4 lg:px-6"
           >
             <div className="min-w-0 flex-1">
               <h3 className="flex items-start gap-1.5 text-list font-semibold leading-snug text-ink">

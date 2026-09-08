@@ -13,7 +13,7 @@ export function UnderConstruction({
   featureKey: AdvisoryFeature;
 }) {
   return (
-    <div className="mx-auto max-w-2xl px-5 py-12">
+    <div className="mx-auto max-w-2xl px-4 py-12 lg:px-6">
       <div className="mb-8">
         <p className="mb-2 text-meta font-semibold text-ink-sub">준비 중</p>
         <h1 className="text-2xl font-bold leading-snug text-ink">
@@ -40,7 +40,7 @@ export function UnderConstruction({
         ))}
       </div>
 
-      <div className="mt-10">
+      <div className="mt-8">
         <ButtonLink href="/" variant="secondary">
           커뮤니티 둘러보기
         </ButtonLink>

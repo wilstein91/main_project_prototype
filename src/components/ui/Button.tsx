@@ -4,8 +4,14 @@ import type { ComponentProps, ReactNode } from "react";
 type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "md" | "sm";
 
+/*
+ * transition-colors 를 쓰지 않고 두 속성만 지정한다. transition-colors 에는
+ * outline-color 가 들어 있어서, 흰 글자 버튼에 키보드 초점이 갈 때 초점
+ * 테두리가 흰색에서 브랜드색으로 서서히 변한다 — 흰 바탕에서는 그동안
+ * 테두리가 보이지 않는다.
+ */
 const base =
-  "inline-flex items-center justify-center gap-1.5 rounded-[var(--radius-sm)] font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed";
+  "inline-flex items-center justify-center gap-1.5 rounded-[var(--radius-sm)] font-semibold transition-[background-color,color] disabled:opacity-40 disabled:cursor-not-allowed";
 
 const variants: Record<Variant, string> = {
   primary: "bg-brand text-white hover:bg-brand-strong",

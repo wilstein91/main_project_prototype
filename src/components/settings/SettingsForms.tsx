@@ -20,7 +20,7 @@ export function NicknameForm({
   const locked = Boolean(blockedUntil);
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form action={action} className="flex flex-col gap-5">
       <FormFeedback state={state} />
       <Field
         label="닉네임"
@@ -53,7 +53,7 @@ export function PasswordForm() {
   const [state, action] = useActionState(updatePasswordAction, idle);
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form action={action} className="flex flex-col gap-5">
       <FormFeedback state={state} />
       <Field
         label="새 비밀번호"

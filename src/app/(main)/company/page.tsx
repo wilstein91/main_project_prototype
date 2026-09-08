@@ -22,7 +22,7 @@ export default function CompanyPage() {
 
   // 법인 설립 후 활성화될 실제 내용 — 미리 개발해 둔다.
   return (
-    <div className="px-4 py-6 lg:px-0 lg:py-0">
+    <div className="px-4 py-6 lg:px-6 lg:py-0">
       <h1 className="text-[26px] font-bold text-ink">회사 소개</h1>
     </div>
   );

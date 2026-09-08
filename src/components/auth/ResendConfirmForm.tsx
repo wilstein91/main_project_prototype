@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { resendSignUpAction } from "@/lib/actions/auth";
 import { idle } from "@/lib/actions/result";
-import { Input } from "@/components/ui/Field";
+import { Field, Input } from "@/components/ui/Field";
 import { FormFeedback } from "@/components/ui/FormFeedback";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 
@@ -29,7 +29,7 @@ export function ResendConfirmForm({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-meta font-semibold text-brand underline underline-offset-2"
+        className="tap -mx-2 px-2 text-meta font-semibold text-brand underline underline-offset-2"
       >
         메일이 오지 않았나요?
       </button>
@@ -37,21 +37,22 @@ export function ResendConfirmForm({
   }
 
   return (
-    <form action={action} className="flex flex-col gap-3">
+    <form action={action} className="flex flex-col gap-5">
       <FormFeedback state={state} />
       {!state.ok && (
         <>
-          <label className="text-meta font-semibold text-ink">
-            가입한 이메일
-          </label>
-          <Input
-            type="email"
-            name="email"
-            autoComplete="email"
-            defaultValue={defaultEmail}
-            placeholder="you@example.com"
-            required
-          />
+          {/* label 은 Field 가 input 을 감싸서 연결한다 — 따로 두면
+              읽기 프로그램이 둘을 잇지 못한다 */}
+          <Field label="가입한 이메일">
+            <Input
+              type="email"
+              name="email"
+              autoComplete="email"
+              defaultValue={defaultEmail}
+              placeholder="you@example.com"
+              required
+            />
+          </Field>
           <div className="flex justify-start">
             <SubmitButton
               variant="secondary"

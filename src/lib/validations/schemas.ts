@@ -27,7 +27,7 @@ export const passwordSchema = z
       re.test(v),
     ).length;
     return kinds >= 2;
-  }, "영문·숫자·특수문자 중 2종 이상을 조합하세요.");
+  }, "영문·숫자·특수문자 중 2종 이상을 섞어 주세요.");
 
 export const emailSchema = z
   .email("이메일 형식이 올바르지 않습니다.")
@@ -49,7 +49,7 @@ export const signUpSchema = z.object({
 
 export const signInSchema = z.object({
   email: emailSchema,
-  password: z.string().min(1, "비밀번호를 입력하세요."),
+  password: z.string().min(1, "비밀번호를 입력해 주세요."),
   redirect: z.string().optional(),
 });
 
@@ -73,16 +73,16 @@ const checkbox = z
   .transform((v) => v === "on");
 
 export const postSchema = z.object({
-  categoryId: z.coerce.number().int().positive("카테고리를 선택하세요."),
+  categoryId: z.coerce.number().int().positive("카테고리를 선택해 주세요."),
   title: z
     .string()
     .trim()
-    .min(1, "제목을 입력하세요.")
+    .min(1, "제목을 입력해 주세요.")
     .max(100, "제목은 100자 이하여야 합니다."),
   content: z
     .string()
     .trim()
-    .min(1, "내용을 입력하세요.")
+    .min(1, "내용을 입력해 주세요.")
     .max(20000, "본문은 20,000자 이하여야 합니다."),
   /** 관리자만 켤 수 있다. 최종 판정은 RLS (0003 마이그레이션) */
   isPinned: checkbox,
@@ -98,7 +98,7 @@ export const commentSchema = z.object({
   content: z
     .string()
     .trim()
-    .min(1, "내용을 입력하세요.")
+    .min(1, "내용을 입력해 주세요.")
     .max(1000, "댓글은 1,000자 이하여야 합니다."),
 });
 

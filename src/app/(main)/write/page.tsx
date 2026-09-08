@@ -15,8 +15,8 @@ export default async function WritePage({ searchParams }: PageProps<"/write">) {
   const preset = typeof category === "string" ? category : undefined;
 
   return (
-    <div className="px-4 py-5 lg:px-0 lg:py-0">
-      <h1 className="mb-4 text-title font-bold text-ink">글쓰기</h1>
+    <div className="px-4 py-6 lg:px-6 lg:py-0">
+      <h1 className="mb-6 text-title font-bold text-ink">글쓰기</h1>
       {isSeedMode() && <PendingNotice ticket="Supabase 연결" />}
       <PostForm
         categories={categories}

@@ -60,8 +60,8 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
 
       {message && (
         <div
-          role="status"
-          className="mb-4 rounded-[var(--radius-sm)] bg-danger/8 px-4 py-3 text-meta leading-relaxed text-danger"
+          role="alert"
+          className="mb-5 rounded-[var(--radius-sm)] bg-danger/8 px-4 py-3 text-meta leading-relaxed text-danger"
         >
           <b className="font-bold">확인 필요</b> {message}
           <div className="mt-2">

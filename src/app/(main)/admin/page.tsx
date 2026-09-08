@@ -34,8 +34,8 @@ export default async function AdminPage() {
   ]);
 
   return (
-    <div className="px-4 py-5 lg:px-0 lg:py-0">
-      <div className="mb-4 flex items-center gap-2">
+    <div className="px-4 py-6 lg:px-6 lg:py-0">
+      <div className="mb-6 flex items-center gap-2">
         <h1 className="text-title font-bold text-ink">관리자</h1>
         <Badge tone="brand">admin</Badge>
       </div>
@@ -94,7 +94,7 @@ export default async function AdminPage() {
                   action={deletePostAction}
                   hidden={{ postId: p.id }}
                   confirmMessage="관리자 권한으로 이 글을 삭제합니다. 기록이 남습니다."
-                  className="text-meta"
+                  className="px-2 text-meta"
                 />
               )}
             </li>
@@ -102,7 +102,7 @@ export default async function AdminPage() {
         </ul>
       </section>
 
-      <div className="mt-10">
+      <div className="mt-8">
         <AuditLogTable entries={auditLogs} />
       </div>
     </div>

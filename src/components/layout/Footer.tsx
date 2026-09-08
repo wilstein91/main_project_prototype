@@ -17,7 +17,7 @@ import { FOOTER_NOTICE } from "@/config/legal";
 export function Footer() {
   return (
     <footer className="mt-12 border-t border-line bg-surface">
-      <div className="mx-auto max-w-[1200px] px-5 py-10 lg:px-6">
+      <div className="mx-auto max-w-[1200px] px-4 py-10 lg:px-6">
         <nav
           aria-label="사이트 정보"
           className="mb-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-meta font-semibold"

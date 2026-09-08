@@ -6,11 +6,9 @@ import { redirect } from "next/navigation";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient, getSessionProfile } from "@/lib/supabase/server";
 import { idSchema, postSchema, postUpdateSchema } from "@/lib/validations/schemas";
-import { fail, fromSupabase, fromZod, type ActionState } from "./result";
+import { fail, NOT_CONFIGURED_MESSAGE, fromSupabase, fromZod, type ActionState } from "./result";
 
-const NOT_CONFIGURED = fail(
-  "아직 데이터베이스가 연결되지 않았습니다. .env.local 에 Supabase 키를 넣어주세요.",
-);
+const NOT_CONFIGURED = fail(NOT_CONFIGURED_MESSAGE);
 
 export async function createPostAction(
   _prev: ActionState,
@@ -23,7 +21,7 @@ export async function createPostAction(
 
   const supabase = await createClient();
   const profile = await getSessionProfile();
-  if (!profile) return fail("로그인이 필요합니다.");
+  if (!profile) return fail("로그인이 필요합니다. 로그인 후 다시 시도해 주세요.");
 
   const isAdmin = profile.role === "admin";
 
@@ -71,7 +69,7 @@ export async function updatePostAction(
 
   const supabase = await createClient();
   const profile = await getSessionProfile();
-  if (!profile) return fail("로그인이 필요합니다.");
+  if (!profile) return fail("로그인이 필요합니다. 로그인 후 다시 시도해 주세요.");
 
   const isAdmin = profile.role === "admin";
   const now = new Date().toISOString();

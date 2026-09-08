@@ -12,11 +12,9 @@ import {
   signUpSchema,
   updatePasswordSchema,
 } from "@/lib/validations/schemas";
-import { fail, fromSupabase, fromZod, succeed, type ActionState } from "./result";
+import { fail, NOT_CONFIGURED_MESSAGE, fromSupabase, fromZod, succeed, type ActionState } from "./result";
 
-const NOT_CONFIGURED = fail(
-  "아직 데이터베이스가 연결되지 않았습니다. .env.local 에 Supabase 키를 넣어주세요.",
-);
+const NOT_CONFIGURED = fail(NOT_CONFIGURED_MESSAGE);
 
 export async function signUpAction(
   _prev: ActionState,
@@ -166,7 +164,7 @@ export async function updatePasswordAction(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return fail("로그인이 필요합니다.");
+  if (!user) return fail("로그인이 필요합니다. 로그인 후 다시 시도해 주세요.");
 
   const { error } = await supabase.auth.updateUser({
     password: parsed.data.password,

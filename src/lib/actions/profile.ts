@@ -8,11 +8,9 @@ import {
   formatKstDate,
   nicknameChangeAvailableAt,
 } from "@/lib/profile-rules";
-import { fail, fromSupabase, fromZod, succeed, type ActionState } from "./result";
+import { fail, NOT_CONFIGURED_MESSAGE, fromSupabase, fromZod, succeed, type ActionState } from "./result";
 
-const NOT_CONFIGURED = fail(
-  "아직 데이터베이스가 연결되지 않았습니다. .env.local 에 Supabase 키를 넣어주세요.",
-);
+const NOT_CONFIGURED = fail(NOT_CONFIGURED_MESSAGE);
 
 export async function updateNicknameAction(
   _prev: ActionState,
@@ -24,7 +22,7 @@ export async function updateNicknameAction(
   if (!parsed.success) return fromZod(parsed.error);
 
   const profile = await getSessionProfile();
-  if (!profile) return fail("로그인이 필요합니다.");
+  if (!profile) return fail("로그인이 필요합니다. 로그인 후 다시 시도해 주세요.");
 
   if (profile.nickname === parsed.data.nickname) {
     return fail("현재 닉네임과 같습니다.");
@@ -77,7 +75,7 @@ export async function withdrawAction(
   if (!isSupabaseConfigured()) return NOT_CONFIGURED;
 
   const profile = await getSessionProfile();
-  if (!profile) return fail("로그인이 필요합니다.");
+  if (!profile) return fail("로그인이 필요합니다. 로그인 후 다시 시도해 주세요.");
 
   const supabase = await createClient();
   const { error } = await supabase
@@ -89,5 +87,5 @@ export async function withdrawAction(
 
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
-  return succeed("탈퇴 처리되었습니다.");
+  return succeed("회원 탈퇴를 처리했습니다.");
 }

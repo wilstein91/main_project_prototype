@@ -17,7 +17,7 @@ export function ResetRequestForm() {
   if (state.ok) return <FormFeedback state={state} />;
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form action={action} className="flex flex-col gap-5">
       <FormFeedback state={state} />
       <Field label="이메일" required>
         <Input
@@ -29,7 +29,7 @@ export function ResetRequestForm() {
         />
         <FieldError state={state} name="email" />
       </Field>
-      <SubmitButton className="mt-2" pendingLabel="발송 중…">
+      <SubmitButton pendingLabel="발송 중…">
         재설정 링크 받기
       </SubmitButton>
     </form>

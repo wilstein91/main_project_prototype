@@ -36,7 +36,7 @@ export function AuditLogTable({ entries }: { entries: AuditEntry[] }) {
 
       {entries.length === 0 ? (
         <p className="rounded-[var(--radius-md)] border border-line px-4 py-6 text-center text-meta text-ink-sub">
-          기록이 없습니다.
+          아직 기록이 없습니다. 운영자가 타인의 글이나 댓글을 삭제하면 여기에 남습니다.
         </p>
       ) : (
         <ul className="divide-y divide-line overflow-hidden rounded-[var(--radius-md)] border border-line">

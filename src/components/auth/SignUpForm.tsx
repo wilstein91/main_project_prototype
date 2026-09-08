@@ -52,7 +52,7 @@ export function SignUpForm() {
      * 않은 HTML 이고, 브라우저가 내부 폼을 버려서 제출이 되지 않는다.
      */
     <>
-      <form action={action} className="flex flex-col gap-4">
+      <form action={action} className="flex flex-col gap-5">
         <FormFeedback state={state} />
 
         <Field label="이메일" required hint="인증 메일이 발송됩니다.">
@@ -89,7 +89,7 @@ export function SignUpForm() {
           <FieldError state={state} name="nickname" />
         </Field>
 
-        <fieldset className="mt-2 flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-surface px-4 py-4">
+        <fieldset className="flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-surface px-4 py-4">
           <legend className="sr-only">약관 동의</legend>
           {AGREEMENTS.map((a) => (
             <div key={a.key} className="flex flex-col gap-1">
@@ -125,13 +125,13 @@ export function SignUpForm() {
           ))}
         </fieldset>
 
-        <SubmitButton className="mt-2" pendingLabel="가입 처리 중…">
+        <SubmitButton pendingLabel="가입 처리 중…">
           가입하기
         </SubmitButton>
       </form>
 
       {/* 이미 가입했지만 인증 메일을 못 받은 사용자를 위한 출구 */}
-      <div className="mt-6 border-t border-line pt-4">
+      <div className="mt-8 border-t border-line pt-8">
         <ResendConfirmForm compact />
       </div>
     </>

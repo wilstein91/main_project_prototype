@@ -20,6 +20,14 @@ export interface ActionState {
 
 export const idle: ActionState = { ok: false };
 
+/**
+ * Supabase 가 아직 연결되지 않은 상태(씨드 모드)에서 폼을 제출했을 때.
+ * 개발자에게 하는 말이므로 개발 중에만 보인다 — 네 곳에서 같은 문장을
+ * 쓰고 있었기에 여기 한 곳으로 모았다.
+ */
+export const NOT_CONFIGURED_MESSAGE =
+  "아직 데이터베이스가 연결되지 않았습니다. .env.local 에 Supabase 키를 넣어 주세요.";
+
 export const fail = (
   message: string,
   fieldErrors?: FieldErrors,
@@ -38,7 +46,7 @@ export function fromZod(error: z.ZodError): ActionState {
     (fieldErrors[key] ??= []).push(issue.message);
   }
   const first = Object.values(fieldErrors)[0]?.[0];
-  return { ok: false, message: first ?? "입력값을 확인하세요.", fieldErrors };
+  return { ok: false, message: first ?? "입력한 내용을 확인해 주세요.", fieldErrors };
 }
 
 /**
@@ -53,14 +61,18 @@ interface SupabaseErrorish {
   message: string;
 }
 
+/** 가입·재설정 두 곳에서 같은 문장을 쓴다 */
+const EMAIL_TAKEN =
+  "이미 가입된 이메일입니다. 로그인하거나, 비밀번호를 잊으셨다면 재설정을 이용해 주세요.";
+
 /** 오류 코드 → 한국어 메시지 */
 const BY_CODE: Record<string, string> = {
   // ── 인증
   invalid_credentials: "이메일 또는 비밀번호가 올바르지 않습니다.",
   email_not_confirmed:
     "이메일 인증이 완료되지 않았습니다. 받은 메일의 링크를 눌러 주세요.",
-  email_exists: "이미 가입된 이메일입니다.",
-  user_already_exists: "이미 가입된 이메일입니다.",
+  email_exists: EMAIL_TAKEN,
+  user_already_exists: EMAIL_TAKEN,
   weak_password:
     "이미 유출된 적이 있거나 너무 단순한 비밀번호입니다. 다른 비밀번호를 사용해 주세요.",
   same_password: "현재 비밀번호와 같습니다. 다른 비밀번호를 입력해 주세요.",
@@ -70,18 +82,20 @@ const BY_CODE: Record<string, string> = {
   user_banned: "이용이 제한된 계정입니다.",
   email_address_invalid: "이메일 주소 형식이 올바르지 않습니다.",
   email_provider_disabled: "이메일 로그인이 비활성화되어 있습니다.",
-  captcha_failed: "사람 확인에 실패했습니다. 다시 시도해 주세요.",
+  captcha_failed: "사람 확인을 마치지 못했습니다. 다시 시도해 주세요.",
   bad_code_verifier:
     "인증을 시작한 브라우저와 링크를 연 브라우저가 다릅니다. 같은 브라우저에서 다시 시도해 주세요.",
 
   // ── 발송 한도 — 지금 가장 자주 만나는 오류
+  // 사용자에게 SMTP 설정을 안내하지 않는다 — 회원이 할 수 있는 일이
+  // 아니다. 운영자가 봐야 하는 내용은 fromSupabase 가 서버 로그로 남긴다.
   over_email_send_rate_limit:
-    "메일 발송 한도를 초과했습니다. Supabase 기본 메일러는 시간당 발송 수가 매우 적습니다. 잠시 후 다시 시도하거나 커스텀 SMTP 를 연결해 주세요.",
+    "메일 발송 한도를 초과했습니다. 잠시 후 다시 시도해 주세요.",
   over_request_rate_limit:
     "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
 
   // ── DB (Postgres SQLSTATE)
-  "42501": "권한이 없습니다.",
+  "42501": "이 작업을 수행할 권한이 없습니다.",
   "23505": "이미 사용 중인 값입니다.",
   "23503": "존재하지 않는 대상입니다.",
   "23514": "입력값이 허용 범위를 벗어났습니다.",
@@ -94,19 +108,19 @@ const BY_TEXT: [RegExp, string][] = [
     /email not confirmed/i,
     "이메일 인증이 완료되지 않았습니다. 받은 메일의 링크를 눌러 주세요.",
   ],
-  [/already (been )?registered|already exists/i, "이미 가입된 이메일입니다."],
+  [/already (been )?registered|already exists/i, EMAIL_TAKEN],
   [
     /you can only request this after (\d+) seconds?/i,
     "너무 자주 요청했습니다. 잠시 후 다시 시도해 주세요.",
   ],
   [
     /email rate limit exceeded/i,
-    "메일 발송 한도를 초과했습니다. 잠시 후 다시 시도하거나 커스텀 SMTP 를 연결해 주세요.",
+    "메일 발송 한도를 초과했습니다. 잠시 후 다시 시도해 주세요.",
   ],
   [/rate limit|too many requests/i, "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요."],
   [/profiles_nickname_key/i, "이미 사용 중인 닉네임입니다."],
   [/대댓글은 1단계/, "대댓글은 1단계까지만 작성할 수 있습니다."],
-  [/row-level security/i, "권한이 없습니다."],
+  [/row-level security/i, "이 작업을 수행할 권한이 없습니다."],
 ];
 
 export function fromSupabase(error: SupabaseErrorish | string): string {

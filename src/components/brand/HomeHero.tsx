@@ -23,7 +23,7 @@ import { LogoLockup } from "./LogoLockup";
 export function HomeHero() {
   return (
     <section className="border-b border-line bg-brand-soft lg:rounded-t-[var(--radius-md)] lg:border lg:border-line">
-      <div className="px-4 py-6 lg:px-7 lg:py-8">
+      <div className="px-4 py-6 lg:px-8 lg:py-8">
         {/* 로고가 이 화면의 제목 역할을 한다 (h1 은 아래 '최신글' 이 아니다) */}
         <h1>
           <LogoLockup className="w-[290px] max-w-full sm:w-[360px] lg:w-[440px]" />

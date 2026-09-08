@@ -26,7 +26,7 @@ export default async function HomePage() {
             : "lg:rounded-b-[var(--radius-md)] lg:border-t-0"
         }`}
       >
-        <div className="border-b border-line px-4 py-4 lg:px-5">
+        <div className="border-b border-line px-4 py-4 lg:px-6">
           <Heading className="text-title font-bold text-ink">최신글</Heading>
           {/* 띠가 이미 같은 말을 했으면 반복하지 않는다 */}
           {viewer && (
@@ -37,7 +37,7 @@ export default async function HomePage() {
         {items.length === 0 ? (
           <Empty
             title="아직 글이 없습니다"
-            description="첫 글을 남기면 이곳에 표시됩니다."
+            description="첫 글을 남겨보세요."
             action={<ButtonLink href="/write">글쓰기</ButtonLink>}
           />
         ) : (

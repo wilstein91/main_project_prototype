@@ -16,8 +16,12 @@
   --color-canvas: #ffffff;
   --color-surface: #f2f5f4;
   --color-line: #e0e6e4;
+  /* 입력칸 테두리. --line 은 흰 바탕에서 1.26:1 이라 경계로 보이지 않는다.
+     읽는 데 쓰는 구분선과 달리 입력칸의 테두리는 "여기가 입력하는 자리"
+     라는 정보이므로 3:1 을 넘겨야 한다 (WCAG 1.4.11). 3.36:1. */
+  --color-field: #828f8c;
   --color-ink: #15201f;
-  --color-ink-sub: #64726f;
+  --color-ink-sub: #5e6c69;
   --color-brand: #0f6e63;
   --color-brand-strong: #0b5a51; /* 주요 버튼 hover */
   --color-brand-soft: #e4f0ee;
@@ -88,10 +92,44 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* 터치 타겟 최소 44px 확보용 */
+/* ─────────────────────────────────────────────────────────────
+   초점 — 키보드로 이동할 때 지금 어디에 있는지 보여야 한다.
+   :focus-visible 이라 마우스 클릭에는 나오지 않는다. 입력칸에서
+   outline-none 을 걷어냈으므로 초점 테두리는 여기 한 곳에서 정한다.
+   ───────────────────────────────────────────────────────────── */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* 터치 타겟 최소 44px 확보용 — 명시적으로 걸고 싶을 때 */
 @utility tap {
   min-height: 44px;
   min-width: 44px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   터치 타겟 — 손가락으로 쓰는 기기에서만 조작 요소를 44px 로 올린다.
+   마우스에서는 촘촘한 쪽이 읽기 좋다 (DESIGN.md §8). height 가 이미
+   걸려 있어도 min-height 가 이긴다.
+
+   본문 속 링크는 영향받지 않는다 — min-height 는 인라인 요소에
+   적용되지 않으므로, 문단 안의 <a> 는 그대로 두고 버튼처럼 쓰이는
+   (inline-flex·block) 링크만 커진다.
+   ───────────────────────────────────────────────────────────── */
+@media (pointer: coarse) {
+  a,
+  button,
+  select,
+  summary {
+    min-height: 44px;
+  }
 }
 
 /* 짧은 사용자 텍스트 (댓글) — 마크다운을 적용하지 않는 곳 */

@@ -41,7 +41,7 @@ export function CommentItem({
 
   if (node.is_deleted) {
     return (
-      <div className={`px-4 py-3.5 text-meta text-ink-sub lg:px-5 ${indent}`}>
+      <div className={`px-4 py-4 text-meta text-ink-sub lg:px-6 ${indent}`}>
         삭제된 댓글입니다.
       </div>
     );
@@ -52,7 +52,7 @@ export function CommentItem({
   const canDelete = Boolean(viewer && (isMine || viewer.isAdmin));
 
   return (
-    <div className={`px-4 py-3.5 lg:px-5 ${indent}`}>
+    <div className={`px-4 py-4 lg:px-6 ${indent}`}>
       <div className="mb-1 flex items-center gap-2 text-meta">
         {isReply && (
           <span aria-hidden className="text-ink-sub">
@@ -77,12 +77,12 @@ export function CommentItem({
           <p className="prose-post text-[15px] text-ink">{node.content}</p>
 
           {(canReply || canEdit || canDelete) && (
-            <div className="mt-2 flex items-center gap-3 text-[12px]">
+            <div className="-mx-2 mt-2 flex items-center gap-1 text-[12px]">
               {canReply && !replying && (
                 <button
                   type="button"
                   onClick={() => setReplying(true)}
-                  className="font-semibold text-ink-sub hover:text-brand"
+                  className="px-2 font-semibold text-ink-sub hover:text-brand"
                 >
                   답글
                 </button>
@@ -91,7 +91,7 @@ export function CommentItem({
                 <button
                   type="button"
                   onClick={() => setEditing(true)}
-                  className="font-semibold text-ink-sub hover:text-brand"
+                  className="px-2 font-semibold text-ink-sub hover:text-brand"
                 >
                   수정
                 </button>
@@ -105,7 +105,7 @@ export function CommentItem({
                       ? "이 댓글을 삭제할까요?"
                       : "관리자 권한으로 이 댓글을 삭제합니다. 기록이 남습니다."
                   }
-                  className="text-[12px]"
+                  className="px-2 text-[12px]"
                 />
               )}
             </div>

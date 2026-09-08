@@ -22,15 +22,13 @@ export function CommentList({
 
   return (
     <section aria-label="댓글" className="border-t border-line">
-      <h2 className="px-4 pb-1 pt-5 text-list font-bold text-ink lg:px-5">
+      <h2 className="px-4 pb-1 pt-5 text-list font-bold text-ink lg:px-6">
         댓글 {total}
       </h2>
 
       {comments.length === 0 ? (
-        <p className="px-4 py-8 text-center text-meta text-ink-sub lg:px-5">
-          {viewer
-            ? "첫 댓글을 남겨보세요."
-            : "아직 댓글이 없습니다."}
+        <p className="px-4 py-8 text-center text-meta text-ink-sub lg:px-6">
+          아직 댓글이 없습니다.{viewer && " 첫 댓글을 남겨보세요."}
         </p>
       ) : (
         <ul className="divide-y divide-line/70">
@@ -64,7 +62,7 @@ export function CommentList({
         </ul>
       )}
 
-      <div className="border-t border-line px-4 py-5 lg:px-5">
+      <div className="border-t border-line px-4 py-5 lg:px-6">
         {viewer ? (
           <CommentForm postId={postId} />
         ) : (

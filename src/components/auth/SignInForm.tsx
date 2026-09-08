@@ -12,7 +12,7 @@ export function SignInForm({ redirectTo }: { redirectTo?: string }) {
   const [state, action] = useActionState(signInAction, idle);
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form action={action} className="flex flex-col gap-5">
       <FormFeedback state={state} />
       {redirectTo && <input type="hidden" name="redirect" value={redirectTo} />}
 
@@ -37,7 +37,7 @@ export function SignInForm({ redirectTo }: { redirectTo?: string }) {
         <FieldError state={state} name="password" />
       </Field>
 
-      <SubmitButton className="mt-2" pendingLabel="로그인 중…">
+      <SubmitButton pendingLabel="로그인 중…">
         로그인
       </SubmitButton>
     </form>
