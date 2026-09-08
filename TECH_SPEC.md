@@ -94,67 +94,79 @@
 Main_Project/
 ├─ src/
 │  ├─ app/
-│  │  ├─ (main)/                          # 커뮤니티 셸 (헤더·사이드바·하단탭·푸터)
+│  │  ├─ (main)/                            # 커뮤니티 셸 (헤더·사이드바·하단탭·푸터)
 │  │  │  ├─ layout.tsx
-│  │  │  ├─ page.tsx                      # 홈 — 통합 피드          [커뮤니티]
-│  │  │  ├─ c/[slug]/page.tsx             # 카테고리 목록           [커뮤니티]
-│  │  │  ├─ c/[slug]/[id]/page.tsx        # 글 상세                 [커뮤니티]
-│  │  │  ├─ c/[slug]/[id]/edit/page.tsx   # 글 수정 (T-14 예정)
-│  │  │  ├─ write/page.tsx                # 글쓰기                  [커뮤니티]
-│  │  │  ├─ settings/page.tsx             # 프로필 설정             [커뮤니티]
-│  │  │  ├─ admin/page.tsx                # 관리자                  [커뮤니티]
-│  │  │  ├─ about/page.tsx                # 서비스 소개             [커뮤니티 · live]
-│  │  │  ├─ terms/page.tsx                #                         [커뮤니티 · live]
-│  │  │  ├─ privacy/page.tsx              #                         [커뮤니티 · live]
-│  │  │  ├─ disclaimer/page.tsx           #                         [커뮤니티 · live]
-│  │  │  ├─ company/page.tsx              # 자문사 소개  [자문사 · under_construction]
-│  │  │  └─ advisory/page.tsx             # 자문 안내    [자문사 · hidden → 404]
-│  │  ├─ (auth)/                          # 인증 셸 (사이드바·하단탭 없음)
+│  │  │  ├─ page.tsx                        # 홈 — 통합 피드          [커뮤니티]
+│  │  │  ├─ c/[slug]/page.tsx               # 카테고리 목록           [커뮤니티]
+│  │  │  ├─ c/[slug]/[id]/page.tsx          # 글 상세                 [커뮤니티]
+│  │  │  ├─ c/[slug]/[id]/edit/page.tsx     # 글 수정 (작성자만)      [커뮤니티]
+│  │  │  ├─ write/page.tsx                  # 글쓰기                  [커뮤니티]
+│  │  │  ├─ settings/page.tsx               # 프로필 설정             [커뮤니티]
+│  │  │  ├─ admin/page.tsx                  # 관리자 (role 재확인)    [커뮤니티]
+│  │  │  ├─ about/page.tsx                  # 서비스 소개             [커뮤니티 · live]
+│  │  │  ├─ terms/page.tsx                  #                         [커뮤니티 · live]
+│  │  │  ├─ privacy/page.tsx                #                         [커뮤니티 · live]
+│  │  │  ├─ disclaimer/page.tsx             #                         [커뮤니티 · live]
+│  │  │  ├─ company/page.tsx                # 자문사 소개  [자문사 · under_construction]
+│  │  │  └─ advisory/page.tsx               # 자문 안내    [자문사 · hidden → 404]
+│  │  ├─ (auth)/                            # 인증 셸 (사이드바·하단탭 없음)
 │  │  │  ├─ layout.tsx
 │  │  │  ├─ login/page.tsx
 │  │  │  ├─ signup/page.tsx
 │  │  │  └─ reset-password/page.tsx
-│  │  ├─ auth/callback/route.ts            # 인증 콜백 (T-11 예정)
-│  │  ├─ layout.tsx                        # html/body · 메타데이터
-│  │  ├─ not-found.tsx
-│  │  ├─ error.tsx
-│  │  ├─ globals.css                       # 디자인 토큰 (@theme)
-│  │  ├─ sitemap.ts                        # 게이트 연동
-│  │  └─ robots.ts                         # 게이트 연동
-│  ├─ config/                              # ★ 규제·사업자 상태 단일 관리 지점
-│  │  ├─ company.ts                        #   사업자 정보 (미확정 = null)
-│  │  ├─ features.ts                       #   트랙 구분 + 공개 상태 게이트
-│  │  └─ legal.ts                          #   법적 고지문 (PRD 부록 A)
+│  │  ├─ auth/callback/route.ts              # 인증 콜백 (code → session)
+│  │  ├─ layout.tsx                          # html/body · 메타데이터
+│  │  ├─ not-found.tsx · error.tsx
+│  │  ├─ globals.css                         # 디자인 토큰(@theme) + 마크다운 스타일
+│  │  ├─ sitemap.ts · robots.ts              # 게이트 연동
+│  ├─ config/                                # ★ 규제·사업자 상태 단일 관리 지점
+│  │  ├─ company.ts                          #   사업자 정보 (미확정 = null)
+│  │  ├─ features.ts                         #   트랙 구분 + 공개 상태 게이트
+│  │  └─ legal.ts                            #   법적 고지문 (PRD 부록 A)
 │  ├─ components/
-│  │  ├─ layout/                           # Header, CategoryNav, BottomTab, Footer
-│  │  ├─ post/                             # PostList (+ PostForm 예정)
-│  │  ├─ comment/                          # CommentList (+ CommentForm 예정)
-│  │  ├─ gate/                             # GatedLink, UnderConstruction
-│  │  └─ ui/                               # Button, Field, Badge, Empty,
-│  │                                       # LegalDoc, PendingNotice
+│  │  ├─ layout/                             # Header, CategoryNav, BottomTab, Footer
+│  │  ├─ auth/                               # SignUpForm, SignInForm, ResetRequestForm
+│  │  ├─ post/                               # PostList, PostForm, PostBody(sanitize)
+│  │  ├─ comment/                            # CommentList, CommentItem, CommentForm
+│  │  ├─ settings/SettingsForms.tsx          # 닉네임·비밀번호·탈퇴
+│  │  ├─ gate/                               # GatedLink, UnderConstruction
+│  │  └─ ui/                                 # Button, Field, Badge, Empty, LegalDoc,
+│  │                                         # SubmitButton, FormFeedback, DeleteForm,
+│  │                                         # PendingNotice(시드 모드 안내)
 │  ├─ lib/
-│  │  ├─ data/                             # 데이터 접근 계층
-│  │  │  ├─ queries.ts                     #   ← Supabase 쿼리로 교체 예정 (T-07~T-10)
-│  │  │  └─ seed.ts                        #   형상 확인용 시드. 연결 후 삭제
-│  │  ├─ supabase/                         # (T-10 예정)
-│  │  │  ├─ client.ts                      #   브라우저 클라이언트
-│  │  │  ├─ server.ts                      #   서버 컴포넌트/액션 클라이언트
-│  │  │  └─ proxy.ts                       #   세션 갱신 헬퍼
-│  │  ├─ actions/                          # Server Actions (T-11~T-16 예정)
-│  │  ├─ validations/                      # zod 스키마 (T-11 예정)
-│  │  ├─ utils/date.ts                     # KST 날짜 포맷
-│  │  └─ site.ts                           # 배포 주소
-│  ├─ types/db.ts                          # ← supabase gen types 로 교체 예정
-│  └─ proxy.ts                             # Next 16 규약 (middleware.ts 아님, T-10 예정)
-├─ supabase/
-│  └─ migrations/
-│     └─ 0001_init.sql                     # 스키마 · 트리거 · RLS (§4)
-├─ .claude/launch.json                     # 개발 서버 (포트 3200)
-├─ AGENTS.md · CLAUDE.md                   # Next 16 문서 참조 지시 (자동 생성)
-├─ PRD.md
-├─ TECH_SPEC.md
-├─ .env.local.example                      # 커밋 대상 (.gitignore 예외)
-└─ .env.local                              # git 제외
+│  │  ├─ data/                               # 데이터 접근 계층
+│  │  │  ├─ types.ts                         #   QueryProvider 계약 + POSTS_PER_PAGE
+│  │  │  ├─ queries.ts                       #   진입점 — 키 유무로 아래 둘 중 선택
+│  │  │  ├─ queries.supabase.ts              #   실 DB 구현
+│  │  │  ├─ queries.seed.ts                  #   시드 구현 (연결 후 삭제)
+│  │  │  └─ seed.ts                          #   시드 데이터 (연결 후 삭제)
+│  │  ├─ supabase/
+│  │  │  ├─ config.ts                        #   isSupabaseConfigured() — 모드 판정
+│  │  │  ├─ client.ts                        #   브라우저 클라이언트
+│  │  │  ├─ server.ts                        #   서버 컴포넌트/액션 + 세션 프로필
+│  │  │  └─ proxy.ts                         #   세션 갱신 + 보호 경로 판정
+│  │  ├─ actions/                            # Server Actions — 데이터 변경 전용
+│  │  │  ├─ result.ts                        #   ActionState, zod·Supabase 오류 변환
+│  │  │  ├─ auth.ts                          #   가입·로그인·로그아웃·비밀번호
+│  │  │  ├─ post.ts                          #   작성·수정·삭제(소프트)·조회수
+│  │  │  ├─ comment.ts                       #   작성·수정·삭제(소프트)
+│  │  │  └─ profile.ts                       #   닉네임 변경·탈퇴
+│  │  ├─ validations/schemas.ts               # zod 스키마 (zod 4 API)
+│  │  ├─ profile-rules.ts                    # 순수 함수 — "use server" 밖에 둔다
+│  │  ├─ session.ts                          # getViewer() — 화면용 세션 조회
+│  │  ├─ utils/date.ts                       # KST 날짜 포맷
+│  │  └─ site.ts                             # 배포 주소
+│  ├─ types/
+│  │  ├─ database.ts                         # Supabase Database 타입 (gen types 로 교체)
+│  │  └─ db.ts                               # 화면용 조회 모델
+│  └─ proxy.ts                               # Next 16 규약 (middleware.ts 아님)
+├─ supabase/migrations/0001_init.sql          # 스키마 · 트리거 · RLS (§4)
+├─ .claude/launch.json                        # 개발 서버 (포트 3200)
+├─ AGENTS.md · CLAUDE.md                      # Next 16 문서 참조 지시 (자동 생성)
+├─ README.md · PRD.md · TECH_SPEC.md
+├─ SUPABASE_SETUP.md                          # DB 연결 절차
+├─ .env.local.example                         # 커밋 대상 (.gitignore 예외)
+└─ .env.local                                 # git 제외
 ```
 
 ---
@@ -961,19 +973,29 @@ PRD 부록 A-1 고지문을 `src/config/legal.ts`에서 읽어 렌더링한다. 
 
 ## 11. 개발 순서 (작업 티켓)
 
-> **진행 현황 (2026-09-08)** — Phase 0 완료, Phase 1 은 화면 형상까지.
-> Supabase 프로젝트가 없어 인증·DB 연결(T-07~T-12)은 착수하지 못했다.
-> 현재 데이터는 `src/lib/data/seed.ts` 시드를 읽으며, `queries.ts` 의 함수
-> 시그니처가 Supabase 쿼리를 그대로 대체할 수 있게 맞춰져 있다.
+> **진행 현황 (2026-09-08)** — Phase 0 완료. Phase 1 코드 완성, DB 연결 대기.
+>
+> Supabase 프로젝트가 아직 없어 **환경변수 유무로 두 모드가 갈린다.**
+> 키가 없으면 `queries.seed.ts`(시드), 있으면 `queries.supabase.ts`(실 DB).
+> 두 구현이 `data/types.ts` 의 `QueryProvider` 를 만족하고 `queries.ts` 가 고른다.
+> 인증·CRUD·권한 코드는 모두 작성되어 있으므로 키를 넣으면 그대로 동작한다.
+> 절차는 [SUPABASE_SETUP.md](SUPABASE_SETUP.md).
 >
 > | 상태 | 티켓 |
 > |---|---|
-> | ✅ 완료 | T-01 T-02(부분) T-04 T-05 · T-13 T-15 T-16 T-19 T-20 T-21 T-22 |
-> | 🔶 형상만 | T-03(폰트 잔여) T-11 T-12 T-14 T-18 T-23 |
-> | ⬜ 미착수 | T-06 T-07 T-08 T-09 T-10 T-17 T-24 T-25 T-26 T-27 |
+> | ✅ 완료 | T-01 T-02 T-04 T-05 · T-10 T-11 T-12 T-13 T-14 T-15 T-16 T-17 T-18 T-19 T-20 T-21 T-22 T-23 |
+> | 🔶 코드 완성 · 실행 대기 | T-07 T-08 T-09 (마이그레이션 작성 완료, 적용 안 됨) |
+> | ⬜ 미착수 | T-03(Pretendard 폰트) T-06(Vercel 배포) T-24 T-25 T-26 T-27 |
 >
-> **다음 착수 지점**: Supabase 프로젝트 생성 → `0001_init.sql` 적용 → T-09 RLS 테스트 → T-10 클라이언트·`proxy.ts`
-
+> **검증된 것**: 타입 검사·ESLint·프로덕션 빌드 통과. 게이트 3상태 동작
+> (`/advisory`→404, `/company`→준비 중). sitemap·robots 게이트 연동.
+> 마크다운 sanitize 실측 — `<script>` `<img onerror>` `<iframe>` `style`
+> `javascript:` 링크 모두 제거, 정상 링크에 `rel="nofollow noopener noreferrer"` 적용.
+>
+> **미검증**: 실 DB 를 쓰는 모든 것 — 인증 흐름, RLS 정책, 트리거,
+> Server Action 의 DB 경로. Supabase 연결 후 확인해야 한다.
+>
+> **다음 착수 지점**: Supabase 프로젝트 생성 → `0001_init.sql` 적용 → §10.5 RLS 4역할 검증
 
 ### Phase 0 — 기반
 

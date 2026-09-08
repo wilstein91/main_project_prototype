@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CommentList } from "@/components/comment/CommentList";
+import { PostBody } from "@/components/post/PostBody";
 import { ButtonLink } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { DeleteForm } from "@/components/ui/DeleteForm";
 import { POST_DISCLAIMER } from "@/config/legal";
-import { getCommentTree, getPost } from "@/lib/data/queries";
+import { deletePostAction } from "@/lib/actions/post";
+import { getCommentTree, getPost, incrementViewCount } from "@/lib/data/queries";
+import { getViewer } from "@/lib/session";
 import { formatCount, formatFullDate } from "@/lib/utils/date";
 
 export async function generateMetadata({
@@ -25,10 +29,23 @@ export default async function PostDetailPage({
   params,
 }: PageProps<"/c/[slug]/[id]">) {
   const { slug, id } = await params;
-  const post = await getPost(Number(id));
+  const postId = Number(id);
+  if (!Number.isInteger(postId) || postId <= 0) notFound();
+
+  const post = await getPost(postId);
   if (!post || post.category_slug !== slug) notFound();
 
-  const comments = await getCommentTree(post.id);
+  const [comments, viewer] = await Promise.all([
+    getCommentTree(post.id),
+    getViewer(),
+  ]);
+
+  // 조회수 (F-208). 실패해도 페이지가 깨지지 않게 던지지 않는다.
+  // 세션 단위 중복 방지는 미적용 — 알려진 한계다 (TECH_SPEC §9.2).
+  await incrementViewCount(post.id);
+
+  const isMine = viewer?.id === post.author_id;
+  const isAdmin = viewer?.role === "admin";
 
   return (
     <article className="lg:rounded-[var(--radius-md)] lg:border lg:border-line lg:bg-canvas">
@@ -60,10 +77,33 @@ export default async function PostDetailPage({
           <span aria-hidden>·</span>
           <span>조회 {formatCount(post.view_count)}</span>
         </div>
+
+        {(isMine || isAdmin) && (
+          <div className="mt-3 flex items-center gap-3 text-meta">
+            {isMine && (
+              <Link
+                href={`/c/${post.category_slug}/${post.id}/edit`}
+                className="font-semibold text-ink-sub hover:text-brand"
+              >
+                수정
+              </Link>
+            )}
+            <DeleteForm
+              action={deletePostAction}
+              hidden={{ postId: post.id }}
+              confirmMessage={
+                isMine
+                  ? "이 글을 삭제할까요?"
+                  : "관리자 권한으로 이 글을 삭제합니다. 기록이 남습니다."
+              }
+              className="text-meta"
+            />
+          </div>
+        )}
       </header>
 
       <div className="px-4 py-6 lg:px-5">
-        <div className="prose-post text-ink">{post.content}</div>
+        <PostBody content={post.content} />
 
         {/* D-1 작성자 책임 고지 */}
         <p className="mt-8 rounded-[var(--radius-sm)] bg-surface px-4 py-3 text-[12px] leading-relaxed text-ink-sub">
@@ -71,23 +111,20 @@ export default async function PostDetailPage({
         </p>
       </div>
 
-      <CommentList comments={comments} />
+      <CommentList
+        postId={post.id}
+        comments={comments}
+        viewer={viewer ? { id: viewer.id, isAdmin } : null}
+      />
 
-      {/* 비회원 전환 유도 — 팝업·모달을 쓰지 않는다 (PRD §5) */}
-      <div className="border-t border-line px-4 py-5 lg:px-5">
-        <div className="flex flex-col items-start gap-3 rounded-[var(--radius-md)] bg-surface px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-list font-semibold text-ink">
-            댓글을 남기려면 로그인이 필요합니다.
-          </p>
-          <div className="flex shrink-0 gap-2">
-            <ButtonLink href="/login" variant="secondary" size="sm">
-              로그인
-            </ButtonLink>
-            <ButtonLink href="/signup" size="sm">
-              회원가입
-            </ButtonLink>
-          </div>
-        </div>
+      <div className="border-t border-line px-4 py-4 lg:px-5">
+        <ButtonLink
+          href={`/c/${post.category_slug}`}
+          variant="secondary"
+          size="sm"
+        >
+          목록으로
+        </ButtonLink>
       </div>
     </article>
   );
