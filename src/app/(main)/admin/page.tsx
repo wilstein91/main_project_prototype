@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AuditLogTable } from "@/components/admin/AuditLogTable";
 import { Badge } from "@/components/ui/Badge";
 import { DeleteForm } from "@/components/ui/DeleteForm";
 import { PendingNotice } from "@/components/ui/PendingNotice";
 import { deletePostAction } from "@/lib/actions/post";
-import { getPosts, isSeedMode } from "@/lib/data/queries";
+import { getAuditLogs, getPosts, isSeedMode } from "@/lib/data/queries";
 import { getViewer } from "@/lib/session";
 import { formatListDate } from "@/lib/utils/date";
 
@@ -27,7 +28,10 @@ export default async function AdminPage() {
     if (!isSeedMode()) notFound();
   }
 
-  const { items } = await getPosts({ perPage: 30, includeDeleted: true });
+  const [{ items }, auditLogs] = await Promise.all([
+    getPosts({ perPage: 30, includeDeleted: true }),
+    getAuditLogs(),
+  ]);
 
   return (
     <div className="px-4 py-5 lg:px-0 lg:py-0">
@@ -97,6 +101,10 @@ export default async function AdminPage() {
           ))}
         </ul>
       </section>
+
+      <div className="mt-10">
+        <AuditLogTable entries={auditLogs} />
+      </div>
     </div>
   );
 }

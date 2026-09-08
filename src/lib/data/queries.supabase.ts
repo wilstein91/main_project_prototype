@@ -213,3 +213,42 @@ export const supabaseProvider: QueryProvider = {
   getPost,
   getCommentTree,
 };
+
+/**
+ * 관리자 행위 기록 (F-504). audit_logs 는 관리자만 읽을 수 있으므로
+ * (audit_select_admin 정책) 일반 회원이 호출하면 빈 배열이 온다.
+ */
+export async function getAuditLogs(limit = 30) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("audit_logs")
+    .select(
+      `id, action, target_type, target_id, reason, created_at,
+       actor:profiles!audit_logs_actor_id_fkey ( nickname )`,
+    )
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw new Error(`감사 로그 조회 실패: ${error.message}`);
+
+  return (data ?? []).map((row) => {
+    const r = row as unknown as {
+      id: number;
+      action: string;
+      target_type: string;
+      target_id: string;
+      reason: string | null;
+      created_at: string;
+      actor: { nickname: string | null } | null;
+    };
+    return {
+      id: r.id,
+      action: r.action,
+      target_type: r.target_type,
+      target_id: r.target_id,
+      reason: r.reason,
+      created_at: r.created_at,
+      actor_nickname: r.actor?.nickname ?? "알 수 없음",
+    };
+  });
+}

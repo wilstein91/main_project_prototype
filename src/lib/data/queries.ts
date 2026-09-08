@@ -27,5 +27,15 @@ export const getPosts = provider.getPosts;
 export const getPost = provider.getPost;
 export const getCommentTree = provider.getCommentTree;
 
+/**
+ * 감사 로그는 관리자 화면 전용이고 시드 구현이 없다.
+ * 시드 모드에서는 빈 배열을 돌려준다.
+ */
+export async function getAuditLogs(limit?: number) {
+  if (isSeedMode()) return [];
+  const { getAuditLogs: impl } = await import("./queries.supabase");
+  return impl(limit);
+}
+
 export { POSTS_PER_PAGE } from "./types";
 export type { PostsQuery, PostsResult } from "./types";
