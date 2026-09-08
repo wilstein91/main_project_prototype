@@ -141,6 +141,28 @@ npm run build         # 프로덕션 빌드
 - [ ] Advisors → Performance Advisor 확인 (누락 인덱스)
 - [ ] 새 테이블을 추가했다면 `tests/rls/policies.test.ts` 에 케이스 추가
 
+#### SECURITY DEFINER 함수 권한 (2026-09-09 추가)
+
+`revoke execute on function ... from public` **만으로는 비회원 접근이
+막히지 않는다.** PostgreSQL 이 함수 생성 시 PUBLIC 에 주는 자동 부여는
+그것으로 사라지지만, Supabase 는 public 스키마에 기본 권한을 걸어 두어
+`anon` / `authenticated` **직접 부여**가 함께 생긴다. 직접 부여는 PUBLIC
+회수와 별개라 살아남는다.
+
+실제로 0005 에서 이 실수를 했다. 함수 안 권한 검사가 막아 주고 있었지만,
+의도한 방어 한 겹이 조용히 빠진 상태였다 (0006 에서 수정).
+
+- [ ] SECURITY DEFINER 함수마다 **역할 이름을 적어** 회수했다
+      (`revoke ... from anon`, PUBLIC 회수와 별개로)
+- [ ] 판정 쿼리로 확인했다 — anon `실행 차단`, authenticated `실행 가능`
+      ```sql
+      select r.rolname as 역할,
+             case when has_function_privilege(r.rolname, 'public.<함수>(<인자>)', 'execute')
+                  then '실행 가능' else '실행 차단' end as 판정
+        from (values ('anon'), ('authenticated')) as r(rolname);
+      ```
+- [ ] 새 SECURITY DEFINER 함수를 추가할 때 이 절을 다시 본다
+
 ### C-3. 입력 처리 · XSS
 
 - [ ] 사용자 본문이 `rehype-sanitize` 를 통과한다 (`PostBody`)

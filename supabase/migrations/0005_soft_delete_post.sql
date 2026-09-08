@@ -51,6 +51,8 @@
 --
 --   1. search_path 를 public 으로 고정한다 (검색 경로 가로채기 방지)
 --   2. anon 에게는 EXECUTE 를 주지 않는다
+--      → 아래 `revoke ... from public` 만으로는 **부족했다.**
+--        Supabase 의 기본 권한 때문에 anon 직접 부여가 남는다. 0006 참고
 --   3. 권한 비교에 coalesce 를 쓴다. `v_author = auth.uid()` 는
 --      비로그인일 때 NULL 이고, `if not NULL` 은 거짓이므로 검사 없이
 --      통과해 버린다. 이 NULL 함정이 이 함수의 유일한 위험이다.
@@ -90,8 +92,18 @@ revoke execute on function public.soft_delete_post(bigint) from public;
 grant  execute on function public.soft_delete_post(bigint) to authenticated;
 
 -- ── 확인 ───────────────────────────────────────────────────────
--- authenticated 에만 EXECUTE 가 있어야 한다. anon 이 보이면 잘못된 것이다.
+-- 참/거짓을 내지 않는다. 컬럼 이름에 기대값을 적고 값에 true/false 를
+-- 내면 "false여야함 = true" 처럼 읽혀 무엇이 정상인지 알 수 없다.
+-- (실제로 이 실수를 했다 — 0006 주석 참고)
 select
   r.rolname as 역할,
-  has_function_privilege(r.rolname, 'public.soft_delete_post(bigint)', 'execute') as 실행권한
+  case
+    when has_function_privilege(r.rolname, 'public.soft_delete_post(bigint)', 'execute')
+    then '실행 가능'
+    else '실행 차단'
+  end as 판정
 from (values ('anon'), ('authenticated')) as r(rolname);
+
+-- 기대값: anon = '실행 차단', authenticated = '실행 가능'
+-- anon 이 '실행 가능' 으로 나오면 0006 을 이어서 돌린다.
+--   (PUBLIC 회수만으로는 Supabase 의 기본 권한 부여가 남는다)
