@@ -93,8 +93,8 @@ Phase 2~5 할 일 목록도 [PHASES.md](PHASES.md) 에 있다 (여기 중복하�
 ## 테스트 현황
 
 ```bash
-npm run test        # 단위 96개 — DB 불필요
-npm run test:rls    # 통합 34개 — 실 DB 필요 (.env.local)
+npm run test        # 단위 121개 — DB 불필요
+npm run test:rls    # 통합 37개 — 실 DB 필요 (.env.local)
 ```
 
 | 파일 | 검증 대상 |
