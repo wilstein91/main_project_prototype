@@ -5,6 +5,8 @@
 | 문서 | 용도 |
 |---|---|
 | [WORK_UNITS.md](WORK_UNITS.md) | **지금 어디까지 왔는가** ← 진행 상황은 여기 |
+| [PHASES.md](PHASES.md) | 페이즈별 할 일 (Phase 0~5) |
+| [DESIGN.md](DESIGN.md) | 디자인 방향 — 로고·색·타이포·톤 |
 | [FINAL_CHECKLIST.md](FINAL_CHECKLIST.md) | **오픈 전 최종 관문** (기능·비정상 접근·보안) |
 | [PRD.md](PRD.md) | 무엇을 만드는가 — 요구사항, 트랙 분리, 법적 고지문 |
 | [TECH_SPEC.md](TECH_SPEC.md) | 어떻게 만드는가 — 아키텍처, 스키마·RLS, 티켓 정의 |

@@ -7,6 +7,8 @@
 |---|---|
 | [PRD.md](PRD.md) | 무엇을 만드는가 (요구사항 F-101~F-505, 트랙 분리) |
 | [TECH_SPEC.md](TECH_SPEC.md) | 어떻게 만드는가 (스키마·RLS·티켓 정의) |
+| [PHASES.md](PHASES.md) | 페이즈별 할 일 (Phase 0~5 체크리스트) |
+| [DESIGN.md](DESIGN.md) | 디자인 방향 (로고·색·타이포·톤) |
 | **WORK_UNITS.md** | **지금 어디까지 왔는가** ← 이 문서 |
 | [FINAL_CHECKLIST.md](FINAL_CHECKLIST.md) | 오픈 전 최종 점검 (기능·비정상 접근·보안) |
 | [SUPABASE_SETUP.md](SUPABASE_SETUP.md) | DB 연결 절차 |
@@ -79,14 +81,12 @@
 | 테스트 도입 (vitest) | 손으로 확인하는 방식은 반복이 안 된다 |
 | `create_admin` / `create_test_member` / `repair_auth_user` SQL | 메일 없이 계정을 만들고 권한을 검증하기 위해 |
 
-## Phase 2 이후 — 미착수
+## Phase 1 남은 것 · Phase 2 이후
 
-| Phase | 범위 |
-|---|---|
-| Phase 2 | 추천/비추천, 인기글, 검색, 이미지 업로드, 프로필 페이지, 인앱 알림, 신고·임시조치 |
-| Phase 3 | 종목 태그, 활동 기반 등급, FAQ, 문의 폼 · (자문사) 리서치 게시판 |
-| Phase 4 | 편의 구독, 카카오 로그인, 알림톡, 실시간 채팅, 통계 · (자문사) 유료 멤버십 |
-| Phase 5 | 도배 방지, 모니터링, 백업, SEO, 접근성 감사 |
+**P1-D 베이스 디자인 개선**이 Phase 1 의 마지막 할 일이다.
+항목과 이유는 [PHASES.md](PHASES.md), 판단 기준은 [DESIGN.md](DESIGN.md).
+
+Phase 2~5 할 일 목록도 [PHASES.md](PHASES.md) 에 있다 (여기 중복하지 않는다).
 
 ---
 
