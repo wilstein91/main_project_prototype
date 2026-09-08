@@ -4,7 +4,8 @@
 
 - [PRD.md](PRD.md) — 요구사항, 트랙 분리 정책, 법적 고지문
 - [TECH_SPEC.md](TECH_SPEC.md) — 아키텍처, DB 스키마·RLS, 작업 티켓
-- [SUPABASE_SETUP.md](SUPABASE_SETUP.md) — **DB 연결 절차 (다음 할 일)**
+- [SUPABASE_SETUP.md](SUPABASE_SETUP.md) — DB 연결 절차
+- [DEPLOY.md](DEPLOY.md) — **Vercel 배포 절차 (다음 할 일)**
 
 ## 현재 상태
 
