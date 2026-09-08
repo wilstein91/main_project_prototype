@@ -55,7 +55,13 @@ begin
     instance_id, id, aud, role, email, encrypted_password,
     email_confirmed_at, created_at, updated_at,
     raw_app_meta_data, raw_user_meta_data,
-    is_sso_user, is_anonymous
+    is_sso_user, is_anonymous,
+    -- 이 컬럼들을 NULL 로 남기면 인증 서버(GoTrue)가 사용자 조회에
+    -- 실패해 로그인 시 500 "Database error querying schema" 가 난다.
+    -- 반드시 빈 문자열로 채운다 (repair_auth_user.sql 참고).
+    confirmation_token, recovery_token, email_change,
+    email_change_token_new, email_change_token_current,
+    phone_change, phone_change_token, reauthentication_token
   ) values (
     '00000000-0000-0000-0000-000000000000',
     v_user_id, 'authenticated', 'authenticated',
@@ -64,7 +70,8 @@ begin
     now(), now(), now(),
     '{"provider":"email","providers":["email"]}'::jsonb,
     jsonb_build_object('nickname', v_nickname),
-    false, false
+    false, false,
+    '', '', '', '', '', '', '', ''
   );
 
   -- 이메일 로그인에는 identities 행도 필요하다
