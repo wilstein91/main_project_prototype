@@ -3,7 +3,7 @@
 > 세션이 길어져 새 대화로 옮길 때 쓰는 문서다. **새 세션은 이 문서부터
 > 읽는다.** 나머지 문서는 필요할 때 펼친다 (§6 문서 지도).
 >
-> 기준 시점: **2026-09-09**, 태그 `phase1-v1.0`
+> 기준 시점: **2026-09-09**, 태그 `phase1-v1.0` (보안검증 완료분 포함)
 
 ---
 
@@ -29,7 +29,7 @@ C:\Aiffel_Work\Main_Project 이어서 작업할게. HANDOFF.md 읽고 시작해.
 | 스택 | Next.js **16** + TypeScript + Tailwind 4 + Supabase + Vercel |
 | DB | Supabase 프로젝트 ref `suoaovdanimacisbocuk`, 마이그레이션 0001~0005 |
 | 로컬 개발 | `.claude/launch.json` 의 `heroes` (포트 **3200**) |
-| 검사 | 타입·린트·빌드 통과, 단위 테스트 96개 통과, RLS 통합 테스트 34개 |
+| 검사 | 타입·린트·빌드 통과, 단위 **121개** 통과, RLS 통합 **36/37** (1건은 §3.1 미적용 SQL 때문) |
 | 콘텐츠 | 시드 글 26건 · 댓글 48개 · 시드 계정 7개 (오픈 전 삭제 — FINAL_CHECKLIST D-3) |
 
 **Phase 1 v1.0 이 무엇인가**: 기능은 전부 완료·검증됐고, 디자인 기반
@@ -46,7 +46,8 @@ C:\Aiffel_Work\Main_Project 이어서 작업할게. HANDOFF.md 읽고 시작해.
 않았다.** 이걸 돌리기 전까지:
 
 - 회원이 자기 글을 삭제할 수 없다 (실제 버그, 원인은 §5.1)
-- 목록 맨 위에 `RLS 테스트 글` 등 **6건(id 16·19·20·22·25·26)** 이 남아 있다
+- 목록에 테스트 글이 **10건** 남아 있다 (id 16·19·20·22·25·26·54·57·58·59).
+  RLS 테스트를 돌릴 때마다 늘어난다 — 정리가 이 함수를 쓰기 때문이다
 - 시드 글 조회수가 한 자리로 보인다
 
 사용자에게 안내할 것 — SQL 에디터는 이 주소로 바로 열린다:
@@ -60,7 +61,7 @@ https://supabase.com/dashboard/project/suoaovdanimacisbocuk/sql/new
 
 ### 3.2 SQL 이 적용된 뒤 (내가 할 일)
 
-1. 남은 테스트 글 6건 정리 — `soft_delete_post` RPC 로 (테스터 토큰 필요)
+1. 남은 테스트 글 10건 정리 — `soft_delete_post` RPC 로 (테스터 토큰 필요)
 2. RLS 통합 테스트 재실행 — 삭제 경로 검증 3개가 새로 들어갔다
    ```bash
    npx vitest run --config vitest.rls.config.ts
@@ -81,6 +82,38 @@ https://supabase.com/dashboard/project/suoaovdanimacisbocuk/sql/new
 - `supabase gen types` 로 `src/types/database.ts` 자동 생성 전환
   (지금은 손으로 관리 — 함수 추가할 때 여기도 고쳐야 한다)
 - 실기기 QA (iOS·Android)
+
+---
+
+## 보안검증 결과 (2026-09-09) — 취약점 3건 수정
+
+Phase 1 v1.0 마감 전에 프로덕션을 직접 찔러 점검했다. **셋 다 화면으로는
+아무 증상이 없었다.**
+
+| 발견 | 심각도 | 상태 |
+|---|---|---|
+| 오픈 리다이렉트 `?redirect=/..//evil.com` | 높음 (피싱) | 수정·테스트 고정 |
+| 세션 쿠키가 `httpOnly` 아님 → 토큰 탈취 | 높음 (XSS 시 계정 탈취) | 수정·회귀 테스트 |
+| 보안 헤더 HSTS 하나뿐 | 중간 (클릭재킹 등) | 수정 |
+
+자세한 원인과 판단은 §5.9·§5.10 에 있다. 통과한 항목:
+
+- RLS 36/37 — anon 글쓰기·카테고리 수정·감사로그 열람 차단, 회원의 공지
+  작성·고정·타인 글 수정·권한 상승 전부 차단
+- 브라우저 번들에 Supabase 키·주소 없음, `localStorage` 에 토큰 없음
+- 비로그인 `/write` `/admin` `/settings` → `/login?redirect=` 로 307
+- `/advisory` 404, `/company` 준비 중 게이트, `robots.txt` 전면 차단 + `noindex`
+- 리다이렉트를 **쓰는 지점에서 다시 검증**한다 (폼 값을 신뢰하지 않는다)
+- 오류 메시지에 DB 구조·SQL 이 노출되지 않는다
+
+받아들인 절충 (FINAL_CHECKLIST §C-8 참고):
+
+- **CSP `script-src` 미적용** — Next 의 인라인 하이드레이션 스크립트 때문에
+  nonce 배선이 필요하다. 잘못 넣으면 화면이 아예 안 뜨므로 Phase 2 로 미뤘다.
+  대신 `frame-ancestors` `form-action` `base-uri` `object-src` 는 켰다
+  (스크립트 로딩과 무관해 앱 동작이 바뀌지 않는다)
+- 이메일 인증 꺼짐 → 무제한 가입 가능. 오픈 전 필수 (D-1)
+- 유출 비밀번호 차단·CAPTCHA 는 Supabase Pro 필요
 
 ---
 
@@ -193,6 +226,37 @@ UPDATE 정책의 `WITH CHECK` 는 NEW 값만 본다. 회원이 자기 `role` 을
 
 ---
 
+### 5.9 입력 검사만으로는 오픈 리다이렉트를 못 막는다 ★
+
+`safeInternalPath` 는 입력을 세 번 걸렀다 — `/` 로 시작하는지, 역슬래시가
+없는지, 제어문자가 없는지. 그런데 `/..//evil.com` 이 뚫렸다.
+
+단일 슬래시로 시작하니 검사를 다 통과하고, 파싱해도 출신이 유지된다.
+그런데 **URL 파서가 `/..` 를 지우면서 pathname 이 `//evil.com` 이 된다.**
+이 값으로 이동하면 브라우저가 프로토콜 상대 주소로 읽어 외부로 나간다.
+
+교훈: **파싱 전에는 안전해 보이고 파싱 후에 위험해지는 입력이 있다.**
+마지막 관문은 결과 문자열이어야 한다. 지금은 출력도 `//`·`/\` 로 시작하는지
+검사한다. 공격 19종을 `safe-path.redirect.test.ts` 에 고정했다.
+
+### 5.10 Supabase 세션 쿠키는 기본이 httpOnly 가 아니다 ★
+
+`document.cookie` 에서 access token 과 **refresh token 이 그대로 읽혔다.**
+XSS 한 번으로 계정이 넘어가고, refresh token 은 새 access token 을 계속
+받아내므로 피해가 오래 간다.
+
+`@supabase/ssr` 기본 구성은 **브라우저의 Supabase 클라이언트도 같은 쿠키를
+읽는다**고 가정한다. 이 앱에는 브라우저 클라이언트가 없으므로
+(`createBrowserClient` 0곳) `lib/supabase/cookie-options.ts` 로 강제했다.
+
+⚠️ **브라우저에서 Supabase 를 직접 부르기로 방향을 바꾸면 이 파일 때문에
+로그인이 깨진다.** 그때는 지우기 전에 왜 걸었는지부터 읽을 것.
+
+개발 중에는 `secure` 를 걸지 않는다 — `http://localhost` 에서 secure 쿠키는
+브라우저가 버려서 로그인이 안 된다. 운영에서만 켠다.
+
+---
+
 ## 6. 문서 지도
 
 | 문서 | 언제 펼치나 |
@@ -238,6 +302,8 @@ Bash 로 개발 서버를 돌리지 않는다.
 | `a6cd7d0` | **삭제 버그 수정** — 0005 함수 + 테스트 4개 추가 |
 | `7cae016` | 마크 v4 + 삽화(BladeCrest) 4곳 + 앱 안쪽 404 분리 |
 | `7eb66ad` | 가로형 로고 — 언월도 + 나눔명조 윤곽선 워드마크 |
+| `861e7af` | 인수인계 문서(이 문서) |
+| `392c34c` | **보안 취약점 3건 수정** — 오픈 리다이렉트·쿠키 노출·보안 헤더 |
 
 바뀐 화면: 헤더(마크+명조 워드마크), 홈 상단 띠(비회원), `/about` 히어로,
 404, 빈 목록, 글 목록 행.
