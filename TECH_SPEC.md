@@ -973,29 +973,38 @@ PRD 부록 A-1 고지문을 `src/config/legal.ts`에서 읽어 렌더링한다. 
 
 ## 11. 개발 순서 (작업 티켓)
 
-> **진행 현황 (2026-09-08)** — Phase 0 완료. Phase 1 코드 완성, DB 연결 대기.
+> **진행 현황 (2026-09-08)** — 배포 완료. 프로덕션에서 실제 동작 검증함.
+> 주소: https://namjosunhero.vercel.app (색인 차단 상태)
 >
-> Supabase 프로젝트가 아직 없어 **환경변수 유무로 두 모드가 갈린다.**
-> 키가 없으면 `queries.seed.ts`(시드), 있으면 `queries.supabase.ts`(실 DB).
-> 두 구현이 `data/types.ts` 의 `QueryProvider` 를 만족하고 `queries.ts` 가 고른다.
-> 인증·CRUD·권한 코드는 모두 작성되어 있으므로 키를 넣으면 그대로 동작한다.
-> 절차는 [SUPABASE_SETUP.md](SUPABASE_SETUP.md).
+> **프로덕션에서 검증한 것**
+> - 인증: 로그인, 세션 유지, 가드 3경로(`/write` `/admin` `/settings` → `/login?redirect=`)
+> - 게시판: 작성 → 수정 → 소프트 삭제. 삭제 후 목록·상세·anon REST 모두에서 사라짐
+> - 마크다운: h2·강조·목록·인용·표 렌더. **sanitize 실측** — `<script>`
+>   `<img onerror>` `<iframe>` `<div style>` `javascript:` 전부 제거,
+>   정상 링크에 `rel="nofollow noopener noreferrer"` 적용
+> - 댓글: 작성·답글·소프트 삭제. 삭제 시 자리 남고 답글 트리 유지
+> - **깊이 제한: UI 를 우회해 2단계 대댓글을 시도해도 DB 트리거가 차단**
+> - 트리거: `comment_count` 가 실제 수와 항상 일치 (2 → 삭제 후 1)
+> - RLS(anon): 읽기 허용, 쓰기 `42501` 차단, 카테고리 수정 0행
 >
-> | 상태 | 티켓 |
+> **프로덕션에서 재확인된 기능 누락**
+> | 요구사항 | 증상 |
 > |---|---|
-> | ✅ 완료 | T-01 T-02 T-04 T-05 · T-10 T-11 T-12 T-13 T-14 T-15 T-16 T-17 T-18 T-19 T-20 T-21 T-22 T-23 |
-> | 🔶 코드 완성 · 실행 대기 | T-07 T-08 T-09 (마이그레이션 작성 완료, 적용 안 됨) |
-> | ⬜ 미착수 | T-03(Pretendard 폰트) T-06(Vercel 배포) T-24 T-25 T-26 T-27 |
+> | F-503 공지 작성 | 관리자도 공지 카테고리를 고를 수 없다. `PostForm` 이 `write_role='user'` 만 필터해서 `/write?category=notice` 가 조용히 자유게시판으로 떨어진다 |
+> | F-209 공지 고정 | `is_pinned` 를 설정하는 UI 가 없다. 정렬만 구현됨 |
+> | F-303 댓글 수정 | `updateCommentAction` 을 호출하는 UI 가 없다. 삭제만 가능 |
+> | F-208 조회수 | 중복 방지 미구현. 방문마다 증가 (3회 확인) |
 >
-> **검증된 것**: 타입 검사·ESLint·프로덕션 빌드 통과. 게이트 3상태 동작
-> (`/advisory`→404, `/company`→준비 중). sitemap·robots 게이트 연동.
-> 마크다운 sanitize 실측 — `<script>` `<img onerror>` `<iframe>` `style`
-> `javascript:` 링크 모두 제거, 정상 링크에 `rel="nofollow noopener noreferrer"` 적용.
+> **아직 검증 못 한 것** — 회원이 1명뿐이어서 확인 불가
+> - 감사 로그(D-4): 관리자가 **타인** 글을 삭제해야 기록된다
+> - RLS 의 타인 글 수정·삭제 차단
+> - 가입·비밀번호 재설정 흐름 전체 (메일 발송이 막혀 있음, §4.7)
 >
-> **미검증**: 실 DB 를 쓰는 모든 것 — 인증 흐름, RLS 정책, 트리거,
-> Server Action 의 DB 경로. Supabase 연결 후 확인해야 한다.
+> **미착수**: T-03(Pretendard 폰트) · 테스트 전무(§12 가 Phase 1 완료 조건으로
+> 명시한 RLS 4역할·게이트·E2E) · §10 체크리스트 다수(SMTP·CAPTCHA·rate
+> limit·백업·Sentry)
 >
-> **다음 착수 지점**: Supabase 프로젝트 생성 → `0001_init.sql` 적용 → §10.5 RLS 4역할 검증
+> **다음**: 위 기능 누락 4개 → 둘째 계정으로 권한 검증 → 테스트 작성
 
 ### Phase 0 — 기반
 
