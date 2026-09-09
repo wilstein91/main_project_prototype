@@ -6,7 +6,7 @@
 | 작성일 | 2026-09-08 |
 | 대응 PRD | [PRD.md](PRD.md) |
 | 서비스명 | **영웅호걸닷컴** (가칭 · PRD §1.1 확인 사항 미완) |
-| 트랙 구조 | 커뮤니티(규제 게이트 없음) / 자문사(게이트) — PRD §3 |
+| 트랙 구조 | **커뮤니티 전용.** 자문사 트랙은 별도 웹사이트로 분리됨 — PRD §3.4 |
 | 대상 릴리스 | MVP (Phase 1) |
 
 ---
@@ -118,10 +118,10 @@ Main_Project/
 │  │  ├─ layout.tsx                          # html/body · 메타데이터
 │  │  ├─ not-found.tsx · error.tsx
 │  │  ├─ globals.css                         # 디자인 토큰(@theme) + 마크다운 스타일
-│  │  ├─ sitemap.ts · robots.ts              # 게이트 연동
+│  │  ├─ sitemap.ts · robots.ts
 │  ├─ config/                                # ★ 규제·사업자 상태 단일 관리 지점
 │  │  ├─ company.ts                          #   사업자 정보 (미확정 = null)
-│  │  ├─ features.ts                         #   트랙 구분 + 공개 상태 게이트
+│  │  ├─ features.ts                         #   커뮤니티 기능 레지스트리
 │  │  └─ legal.ts                            #   법적 고지문 (PRD 부록 A)
 │  ├─ components/
 │  │  ├─ layout/                             # Header, CategoryNav, BottomTab, Footer
@@ -129,7 +129,6 @@ Main_Project/
 │  │  ├─ post/                               # PostList, PostForm, PostBody(sanitize)
 │  │  ├─ comment/                            # CommentList, CommentItem, CommentForm
 │  │  ├─ settings/SettingsForms.tsx          # 닉네임·비밀번호·탈퇴
-│  │  ├─ gate/                               # GatedLink, UnderConstruction
 │  │  └─ ui/                                 # Button, Field, Badge, Empty, LegalDoc,
 │  │                                         # SubmitButton, FormFeedback, DeleteForm,
 │  │                                         # PendingNotice(시드 모드 안내)
@@ -646,7 +645,7 @@ export type AdvisoryStatus = 'none' | 'quasi_advisory' | 'investment_advisory'
 export const COMPANY = {
   /** 법인 설립 상태 — 커뮤니티 트랙은 이 값에 영향받지 않는다 */
   incorporation: 'pre_incorporation' as IncorporationStatus,
-  /** 자문업 신고·등록 상태 — 자문사 트랙 게이트만 참조한다 */
+  /** 자문업 신고·등록 상태 — 푸터의 등록번호 표기에만 쓴다 */
   advisory: 'none' as AdvisoryStatus,
 
   /** 서비스 가칭 — 인허가 연상 표현을 넣지 않는다 (PRD C-8) */
@@ -700,171 +699,84 @@ export function advisoryRegDisplay(): string {
 - 사업자 정보 문자열을 JSX에 직접 쓰는 것을 금지한다 (리뷰 시 확인 항목).
 - 서비스명은 `layout.tsx` 메타데이터·헤더·OG 태그 모두 `displayServiceName()`을 경유한다.
 
-### 9.6 트랙 분리와 기능 게이트 (`src/config/features.ts`)
+### 9.6 기능 레지스트리 (`src/config/features.ts`)
 
-PRD §3의 트랙 구분과 3단계 상태를 **타입 수준에서 강제**한다.
-핵심은 **커뮤니티 트랙 기능에 게이트를 걸 수 없게 만드는 것**이다. 규제 상태와 무관해야 할 기능이 실수로 막히는 일을 타입 검사에서 잡는다.
+> **v0.4 변경.** 이전에는 커뮤니티/자문사 두 트랙을 타입으로 갈라 3단계
+> 게이트(`hidden` / `under_construction` / `live`)를 강제했다. 자문사 트랙이
+> 별도 웹사이트로 나가면서(PRD §3.4 · O-9) **이 저장소에는 게이트가 없다.**
+> 옮긴 게이트 코드는 [ADVISORY_TRACK_MOVED.md §3](ADVISORY_TRACK_MOVED.md) 에 있다.
+
+남은 것은 **커뮤니티 기능의 목록과 개발 페이즈 기록**이다.
 
 ```ts
-// src/config/features.ts
-export type GateState = 'hidden' | 'under_construction' | 'live'
-
-// ── 커뮤니티 트랙 ── 규제 게이트 없음. 항상 live (PRD §3.2 불변조건)
 export type CommunityFeature =
-  | 'board'          // 게시판·댓글
-  | 'serviceAbout'   // 서비스 소개 /about
-  | 'policyPages'    // 약관·개인정보·투자 유의사항
-  | 'reactions'      // 추천·인기글      (Phase 2)
-  | 'search'         // 검색             (Phase 2)
-  | 'uploads'        // 이미지 업로드    (Phase 2)
-  | 'notifications'  // 인앱 알림        (Phase 2)
-  | 'reports'        // 신고·임시조치    (Phase 2)
-  | 'activityTiers'  // 회원 등급        (Phase 3)
-  | 'tags'           // 종목 태그        (Phase 3)
-  | 'stockPages'     // 종목 페이지·시세 (Phase 3)
-  | 'trendingStocks' // 화제 종목 (집계) (Phase 3)
-  | 'newsBoard'      // 뉴스 공유 게시판 (Phase 4)
-  | 'newsFeed'       // 뉴스 자동 수집   (Phase 4)
-  | 'disclosures'    // 공시·캘린더      (Phase 4)
-  | 'watchlist'      // 관심 종목        (Phase 4)
-  | 'liveChat'       // 실시간 채팅      (Phase 5)
-  | 'bannerAds'      // 배너 광고        (Phase 5)
+  | 'board' | 'serviceAbout' | 'policyPages'
+  | 'reactions' | 'search' | 'uploads' | 'notifications' | 'reports'   // Phase 2
+  | 'activityTiers' | 'tags' | 'stockPages' | 'trendingStocks'         // Phase 3
+  | 'newsBoard' | 'newsFeed' | 'disclosures' | 'watchlist'             // Phase 4
+  | 'liveChat' | 'bannerAds'                                           // Phase 5
 
-// ── 자문사 트랙 ── 규제 게이트 적용
-export type AdvisoryFeature =
-  | 'companyIntro'   // 자문사 소개 /company
-  | 'advisoryIntro'  // 자문 서비스 안내 /advisory
-  | 'researchBoard'  // 리서치 게시판     (Phase 4)
+const COMMUNITY: Record<CommunityFeature, { phase: number }> = { /* ... */ }
 
-export type FeatureKey = CommunityFeature | AdvisoryFeature
-
-/**
- * 커뮤니티 트랙은 GateState 가 아니라 'live' 리터럴만 받는다.
- * 여기에 'hidden' 을 쓰면 컴파일 에러가 난다 — 의도한 제약이다.
- */
-const COMMUNITY: Record<CommunityFeature, { state: 'live'; phase: number }> = {
-  board:            { state: 'live', phase: 1 },
-  serviceAbout:     { state: 'live', phase: 1 },
-  policyPages:      { state: 'live', phase: 1 },
-  reactions:        { state: 'live', phase: 2 },
-  search:           { state: 'live', phase: 2 },
-  uploads:          { state: 'live', phase: 2 },
-  notifications:    { state: 'live', phase: 2 },
-  reports:          { state: 'live', phase: 2 },
-  activityTiers:    { state: 'live', phase: 3 },
-  tags:             { state: 'live', phase: 3 },
-  stockPages:       { state: 'live', phase: 3 },
-  trendingStocks:   { state: 'live', phase: 3 },
-  newsBoard:        { state: 'live', phase: 4 },
-  newsFeed:         { state: 'live', phase: 4 },
-  disclosures:      { state: 'live', phase: 4 },
-  watchlist:        { state: 'live', phase: 4 },
-  liveChat:         { state: 'live', phase: 5 },
-  bannerAds:        { state: 'live', phase: 5 },
-}
-
-const ADVISORY: Record<AdvisoryFeature, { state: GateState; unblockedBy: string }> = {
-  companyIntro:  { state: 'under_construction', unblockedBy: '법인 설립 완료' },
-  advisoryIntro: { state: 'hidden',             unblockedBy: '자문업 신고·등록 완료' },
-  researchBoard: { state: 'hidden',             unblockedBy: '자문업 신고·등록 완료' },
-}
-
-// PRD v0.4: 유료 구독·멤버십(perkSubscription / paidResearch)은 삭제됐다.
-// 이 서비스는 이용자에게 요금을 받지 않는다 (I-2). 수익은 bannerAds 뿐이다.
-
-export const isCommunityFeature = (k: FeatureKey): k is CommunityFeature =>
-  k in COMMUNITY
-
-export function gate(k: FeatureKey): GateState {
-  return isCommunityFeature(k) ? COMMUNITY[k].state : ADVISORY[k].state
-}
-
-export const isLive = (k: FeatureKey) => gate(k) === 'live'
-export const isVisible = (k: FeatureKey) => gate(k) !== 'hidden'
+export const isCommunityFeature = (k: string): k is CommunityFeature => k in COMMUNITY
+export const featurePhase = (k: CommunityFeature): number => COMMUNITY[k].phase
 ```
 
-**`phase` 필드의 의미** — 커뮤니티 기능은 "언제 만드느냐"만 다르고 "공개해도 되느냐"는 항상 참이다. `phase`는 개발 순서를 기록할 뿐 런타임 판정에 쓰지 않는다. 아직 만들지 않은 기능은 코드가 없으므로 라우트도 없다.
+**`phase` 필드의 의미** — 커뮤니티 기능은 "언제 만드느냐"만 다르고 "공개해도
+되느냐"는 항상 참이다. `phase` 는 개발 순서를 기록할 뿐 런타임 판정에 쓰지
+않는다. 아직 만들지 않은 기능은 코드가 없으므로 라우트도 없다.
 
-**금지 기능** — PRD §3.3의 금지 기능(수익률 인증·랭킹, 종목 추천, 매매 신호)은 `CommunityFeature`에 **키 자체를 만들지 않는다.** 필요해지면 `AdvisoryFeature`로 추가하고 게이트를 건다. 신규 기능 추가 시 이 판단을 코드 리뷰 항목으로 둔다.
+**이 파일이 남아서 하는 일은 하나다** — PRD §3.3 금지 기능의 키가 생기지
+못하게 막는 것. `features.test.ts` 의 `FORBIDDEN` 목록이 이를 검사한다.
 
-**상태별 동작**
+| 금지 | 근거 |
+|---|---|
+| `returnRanking` · `profitVerification` · `accountSync` | I-4 수익률 표방 |
+| `stockRecommendation` · `tradingSignal` · `stockScore` · `targetPrice` | I-3 운영 주체가 종목을 고르는 것 |
+| `paidResearch` · `perkSubscription` · `paidSubscription` · `membership` | I-2 이용자에게 요금을 받는 것 |
+| `companyIntro` · `advisoryIntro` · `researchBoard` | 자문사 트랙 — 별도 사이트 |
 
-| 상태 | 라우트 | 링크 | robots | sitemap |
-|---|---|---|---|---|
-| `hidden` | `notFound()` 호출 → 404 | 렌더링하지 않음 | - | 제외 |
-| `under_construction` | `<UnderConstruction />` 렌더 | `<GatedLink>` 비활성 | `noindex, nofollow` | 제외 |
-| `live` | 정상 페이지 | 정상 링크 | 기본값 | 포함 |
+> `trendingStocks`(화제 종목)는 금지가 아니다. 운영 주체가 고르는 것이 아니라
+> 공개 지표를 기계적으로 집계하는 것이며, 화면에 집계 기준과 매수·매도 권유가
+> 아니라는 고지를 함께 표시한다 (PRD I-3 · §A-5-2). **그 고지가 빠지면 금지
+> 기능이 된다.**
 
-**서버 컴포넌트 적용 예 (자문사 트랙)**
+**커뮤니티 페이지에는 게이트 분기를 두지 않는다.**
 
 ```tsx
-// src/app/(public)/company/page.tsx
-import { notFound } from 'next/navigation'
-import { gate } from '@/config/features'
-import { UnderConstruction } from '@/components/gate/UnderConstruction'
-
-export const metadata = {
-  robots: gate('companyIntro') === 'live' ? undefined : { index: false, follow: false },
-}
-
-export default function CompanyPage() {
-  const state = gate('companyIntro')
-  if (state === 'hidden') notFound()
-  if (state === 'under_construction') return <UnderConstruction featureKey="companyIntro" />
-
-  return <CompanyIntro />   // 설립 후 활성화될 실제 내용 — 미리 개발해 둔다
-}
+// app/(main)/c/[slug]/page.tsx — 규제 상태와 무관하게 항상 렌더링된다
+export default async function CategoryPage() { /* 게이트 분기 없음 */ }
 ```
 
-**커뮤니티 트랙 페이지에는 게이트를 걸지 않는다.**
-
-```tsx
-// src/app/(public)/about/page.tsx  — 서비스 소개
-// 게이트 분기 없음. 규제 상태와 무관하게 항상 렌더링된다.
-export default function AboutPage() {
-  return <ServiceIntro />
-}
-```
-
-> 게이트 판정은 **서버에서** 한다. 클라이언트에서 숨기면 `hidden` 상태의 콘텐츠가 번들에 포함되어 열람 가능해진다.
-> 커뮤니티 라우트에 `gate()` 호출이 보이면 트랙 구분이 잘못된 것이다 — 코드 리뷰에서 잡는다.
-
-### 9.7 준비 중 안내와 비활성 링크
-
-#### `UnderConstruction` 컴포넌트
-
-PRD 부록 A-1 고지문을 `src/config/legal.ts`에서 읽어 렌더링한다. 문구를 컴포넌트에 하드코딩하지 않는다 — 변호사 검토 후 수정될 값이다.
-
-- 제목: `본 페이지는 현재 준비 중입니다`
-- 본문: `LEGAL.underConstruction` (부록 A-1 전문)
-- 하단: `커뮤니티 둘러보기` 버튼으로 `/` 복귀 경로 제공 (막다른 길을 만들지 않는다)
-- `<meta name="robots" content="noindex, nofollow">`
-
-#### `GatedLink` 컴포넌트
-
-준비 중 경로의 링크는 지우지 않고 **비활성 상태로 보여준다.** 서비스의 향후 범위를 알리면서도 잘못된 기대를 주지 않는다.
-
-```tsx
-// state === 'live'              → 일반 <Link>
-// state === 'under_construction' → 클릭 불가 + '준비 중' 배지
-// state === 'hidden'            → null (렌더링하지 않음)
-```
-
-비활성 시 접근성 요구사항:
-
-- `<a>` 대신 `<span role="link" aria-disabled="true" tabIndex={-1}>` 사용 — 키보드 포커스가 죽은 링크에 걸리지 않게 한다
-- 시각 표시는 흐림 처리만으로 하지 않고 `준비 중` 텍스트 배지를 함께 둔다 (색만으로 상태를 전달하지 않는다)
-- `title` 속성에 `설립 절차 완료 후 공개됩니다` 안내
+### 9.7 푸터 · sitemap · robots
 
 #### 푸터
 
-`Footer` 컴포넌트는 PRD 부록 A-2 축약 고지(서비스 성격 + 투자 유의)를 상시 노출하고, 그 아래에 `COMPANY.operator` 와 `companyField()` · `advisoryRegDisplay()` 로 운영 주체 정보를 렌더링한다.
+`Footer` 는 PRD 부록 A-2 축약 고지(서비스 성격 + 투자 유의)를 상시 노출하고,
+그 아래에 `COMPANY.operator` 와 `companyField()` · `advisoryRegDisplay()` 로
+운영 주체 정보를 렌더링한다.
 
-푸터의 **서비스 성격 문단은 커뮤니티 트랙 고지**이므로 규제 상태와 무관하게 항상 같은 문구다. 설립·신고 후에는 사업자 정보 항목만 실제 값으로 바뀐다.
+서비스 성격 문단은 규제 상태와 무관하게 항상 같은 문구다. 설립·신고 후에는
+사업자 정보 항목만 실제 값으로 바뀐다.
+
+> **`자문업 등록·신고번호: 해당 없음 (미신고)` 를 지우지 말 것.** 자문사
+> 트랙을 내보낸 뒤에도 남는다 — 자문사에 관한 정보가 아니라 **이 사이트가
+> 자문사가 아니라는 고지**이기 때문이다 (PRD C-3 · §3.7).
+
+#### 자문사 사이트 링크
+
+푸터에 자문·일임사 웹사이트로 나가는 링크 자리가 있다. `COMPANY.advisorySiteUrl`
+이 `null` 이면 아무것도 렌더하지 않는다.
+
+> ⚠️ **자문업 신고·등록 완료 후에만 채운다.** 등록 전에 켜면 커뮤니티가
+> 미등록 자문 서비스를 광고하는 모양이 되어, 규제와 무관해야 할 커뮤니티까지
+> 규제 대상으로 끌고 들어간다 (PRD §3.4).
 
 #### sitemap · robots
 
-`app/sitemap.ts` 는 라우트 목록을 `isLive()` 로 필터링한다. 게이트가 열리면 sitemap이 자동으로 갱신되므로 별도 작업이 없다.
+게이트가 없으므로 조건 분기도 없다. `app/sitemap.ts` 는 공개 라우트를 그대로
+싣고, `app/robots.ts` 는 인증이 필요한 경로(`/admin` `/settings` `/write`
+`/auth/`)만 제외한다. 색인 자체는 `ALLOW_INDEXING` 환경변수가 통제한다.
 
 ### 9.8 전환 절차 (설립·신고 완료 시)
 
@@ -873,14 +785,19 @@ PRD 부록 A-1 고지문을 `src/config/legal.ts`에서 읽어 렌더링한다. 
 | 1 | `incorporation`을 `incorporated`로, 사업자 정보 5개 항목을 실제 값으로 | `config/company.ts` |
 | 2 | `operator`를 법인 표기로, `isTentativeName`을 `false`로 | `config/company.ts` |
 | 3 | 자문업 신고·등록 완료 시 `advisory`와 `advisoryRegNo` 설정 | `config/company.ts` |
-| 4 | **`ADVISORY` 대상 기능의 `state`를 `live`로 변경** | `config/features.ts` |
-| 5 | 준비 중 고지문 제거, 정식 고지문으로 교체 | `config/legal.ts` |
-| 6 | 이용약관·개인정보처리방침의 사업자 표기 갱신 | `app/(public)/terms`, `privacy` |
-| 7 | 재배포 후 sitemap·robots 반영 확인 | - |
+| 4 | **자문업 등록 완료 후** `advisorySiteUrl` 에 자문사 사이트 주소 입력 | `config/company.ts` |
+| 5 | 이용약관·개인정보처리방침의 사업자 표기 갱신 | `app/(main)/terms`, `privacy` |
+| 6 | 재배포 후 sitemap·robots 반영 확인 | - |
 
-**커뮤니티 트랙은 이 절차에서 건드릴 것이 없다.** 전환 작업이 커뮤니티 코드에 닿았다면 트랙 분리가 깨진 것이다.
+> 4번은 **등록이 실제로 끝난 뒤에만** 한다. 등록 전에 켜면 커뮤니티가 미등록
+> 자문 서비스를 광고하는 모양이 된다 (PRD §3.4).
 
-**검증**: 위 절차를 Phase 1 완료 시점에 **스테이징에서 1회 리허설**한다 (PRD G-6). 코드 수정이 필요했다면 중앙화가 덜 된 것이므로 되돌아가 고친다.
+**전부 `config/company.ts` 한 파일이다.** 자문사 트랙이 별도 웹사이트로
+나가면서(PRD §3.4 · O-9) 이 저장소에서 전환할 게이트가 없어졌다. 전환 작업이
+커뮤니티 화면 코드에 닿았다면 사업자 정보 중앙화(§9.5)가 덜 된 것이다.
+
+> **~~전환 리허설~~은 폐기됐다** (PRD G-6). 게이트가 없으므로 리허설할 절차도
+> 없다. 남은 것은 설정 값 교체뿐이고, 그건 배포 후 푸터를 눈으로 확인하면 된다.
 
 ---
 
@@ -952,18 +869,18 @@ PRD 부록 A-1 고지문을 `src/config/legal.ts`에서 읽어 렌더링한다. 
 
 - [ ] **I-1** 운영자 계정의 게시물이 서비스 운영 공지로만 구성되어 있는지 확인. 시황·종목 의견 게시물 없음
 - [ ] **I-2** 유료 기능이 커뮤니티 편의(광고 제거·용량·뱃지)에 한정되고, 투자정보 열람 대가가 아닌지 확인
-- [ ] **I-3** 인기글·랭킹의 정렬 기준이 조회·반응 수이며 수익률·추천도가 아닌지 코드에서 확인
+- [ ] **I-2** 이용자에게 요금을 받는 기능이 존재하지 않는지 확인 (전 기능 무료)
+- [ ] **I-3** 인기글 정렬이 조회·반응 수인지, 종목 순위가 공개 지표의 기계적 집계이고 **집계 기준 + 매수·매도 권유 아님 고지**가 화면에 있는지 확인
 - [ ] **I-4** 수익률 인증·랭킹·계좌 연동 손익 기능이 존재하지 않는지 확인
-- [ ] PRD §3.3 금지 기능 목록의 키가 `CommunityFeature` 에 추가되지 않았는지 확인
-- [ ] 커뮤니티 라우트에 `gate()` 호출이 없는지 확인 (있으면 트랙 구분 오류)
+- [ ] **I-5** 시세·뉴스·공시에 출처·시점이 표기되고, 운영자 논평이 붙지 않았는지 확인
+- [ ] PRD §3.3 금지 기능 목록의 키가 `CommunityFeature` 에 추가되지 않았는지 확인 (`features.test.ts`)
 - [ ] 관리자 운영 수칙 문서화 및 운영자 숙지 (PRD D-5)
 
-**자문사 트랙 게이트**
+**자문사 트랙이 이 사이트에 없는지**
 
-- [ ] `hidden` 상태 라우트에 직접 URL로 접근했을 때 404가 반환되는지 확인 (콘텐츠가 새지 않는지)
-- [ ] `under_construction` 페이지에 `noindex` 가 실제로 적용되었는지 확인 (배포본에서 검증)
-- [ ] sitemap.xml 에 `hidden` / `under_construction` 경로가 포함되지 않았는지 확인
-- [ ] 비활성 링크가 키보드 탭 순서에서 제외되고 `aria-disabled` 가 부여되었는지 확인
+- [ ] `/company` · `/advisory` · `/research` 가 404 인지 (`tests/rls/abuse.test.ts` 가 고정)
+- [ ] `COMPANY.advisorySiteUrl` 이 `null` 인지 — **자문업 등록 전에는 반드시 null** (PRD §3.4)
+- [ ] sitemap.xml 에 자문사 경로가 없는지
 
 **표기**
 
@@ -1026,8 +943,8 @@ PRD 부록 A-1 고지문을 `src/config/legal.ts`에서 읽어 렌더링한다. 
 | T-01 | Next.js + TS + Tailwind 프로젝트 생성, Git 초기화 | 로컬 기동 |
 | T-02 | Supabase 프로젝트 생성, 환경변수 세팅, `.env.local.example` 작성 | 연결 확인 |
 | T-03 | 디자인 토큰 · 기본 UI 컴포넌트 | 버튼/입력/뱃지 렌더 |
-| T-04 | **설정 중앙화 골격** (`config/company.ts` · `features.ts` · `legal.ts`) + 게이트 컴포넌트 3종 (§9.5~9.7) | 게이트 상태 변경이 화면에 반영됨 |
-| T-05 | 레이아웃 셸 (헤더 / 사이드바 / 하단 탭 / **푸터 고지 · GatedLink 포함**) | 3개 브레이크포인트 확인 |
+| T-04 | **설정 중앙화 골격** (`config/company.ts` · `features.ts` · `legal.ts`) (§9.5~9.7) | 설정 변경이 화면에 반영됨 |
+| T-05 | 레이아웃 셸 (헤더 / 사이드바 / 하단 탭 / **푸터 고지 포함**) | 3개 브레이크포인트 확인 |
 | T-06 | **Vercel 배포 파이프라인 연결** | 실제 URL 접속 성공 |
 
 > T-06을 마지막으로 미루지 않는다. 빈 화면이라도 배포 경로를 먼저 뚫는다.
@@ -1056,7 +973,7 @@ PRD 부록 A-1 고지문을 `src/config/legal.ts`에서 읽어 렌더링한다. 
 | T-23 | 관리자 최소 기능 (강제 삭제 · 공지 작성 · 감사 로그) | 관리자 계정 검증 |
 | T-24 | 오류/빈 상태/스켈레톤, 메타태그 | Lighthouse 확인 |
 | T-25 | **§10 보안·운영 체크리스트 전 항목 완료** (§10.9 트랙 분리·규제 표기 포함) | 체크리스트 100% |
-| T-26 | **전환 리허설** — 스테이징에서 설정 파일만 교체해 자문사 영역 활성화. **커뮤니티 코드 무변경 확인** (PRD G-5·G-6) | 코드 수정 없이 활성화 성공 |
+| ~~T-26~~ | ~~전환 리허설~~ → **폐기 (v0.4).** 자문사 트랙을 별도 웹사이트로 분리해 리허설할 게이트가 없다 (PRD §3.4 · G-6) | — |
 | T-27 | 실기기 QA (iOS Safari / Android Chrome) | QA 시트 통과 |
 
 ---

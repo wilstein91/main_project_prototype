@@ -1,5 +1,4 @@
 import type { MetadataRoute } from "next";
-import { isLive } from "@/config/features";
 import { getCategories, getPosts } from "@/lib/data/queries";
 import { SITE_URL } from "@/lib/site";
 
@@ -37,14 +36,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.6,
     });
-  }
-
-  // 자문사 트랙은 게이트가 live 일 때만 노출한다.
-  if (isLive("companyIntro")) {
-    entries.push({ url: `${SITE_URL}/company`, priority: 0.4 });
-  }
-  if (isLive("advisoryIntro")) {
-    entries.push({ url: `${SITE_URL}/advisory`, priority: 0.4 });
   }
 
   return entries;

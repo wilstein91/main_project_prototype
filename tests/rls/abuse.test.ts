@@ -120,9 +120,17 @@ describe("앱 라우팅 — 비정상 접근", () => {
     }
   });
 
-  it("숨긴 자문사 경로는 404 다 (존재를 알리지 않는다)", async () => {
-    const r = await head("/advisory");
-    expect(r.status).toBe(404);
+  /**
+   * 자문사 트랙을 별도 웹사이트로 내보낸 뒤(PRD O-9) 이 사이트에는 해당
+   * 경로가 없다. 라우트가 사라졌으니 404 는 자동으로 나오지만, 이 검사는
+   * 그대로 둔다 — **이 사이트가 자문 관련 페이지를 제공하지 않는다**는
+   * 사실을 고정하는 것이 목적이기 때문이다. 누군가 다시 만들면 깨진다.
+   */
+  it("자문사 경로는 이 사이트에 없다 (404)", async () => {
+    for (const p of ["/advisory", "/company", "/research"]) {
+      const r = await head(p);
+      expect(r.status, p).toBe(404);
+    }
   });
 
   it("글 목록 page 파라미터에 이상한 값이 와도 200 이다", async () => {

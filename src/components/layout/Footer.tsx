@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { GatedLink } from "@/components/gate/GatedLink";
 import {
   advisoryRegDisplay,
   COMPANY,
@@ -13,6 +12,11 @@ import { FOOTER_NOTICE } from "@/config/legal";
  *
  * 서비스 성격 문단은 커뮤니티 트랙 고지이므로 규제 상태와 무관하게
  * 항상 같은 문구다. 설립·신고 후에는 사업자 정보 항목만 바뀐다.
+ *
+ * `자문업 등록·신고번호: 해당 없음 (미신고)` 표기를 지우지 말 것.
+ * 자문사 트랙을 별도 사이트로 내보낸 뒤에도 이 줄은 남는다 — 자문사에
+ * 관한 정보가 아니라 **이 사이트가 자문사가 아니라는 고지**이기 때문이다
+ * (PRD C-3 · §3.7).
  */
 export function Footer() {
   return (
@@ -34,16 +38,21 @@ export function Footer() {
           <Link href="/disclaimer" className="text-ink hover:text-brand">
             투자 유의사항
           </Link>
-          <GatedLink
-            featureKey="companyIntro"
-            href="/company"
-            className="gap-1.5"
-          >
-            회사 소개
-          </GatedLink>
-          <GatedLink featureKey="advisoryIntro" href="/advisory">
-            자문 서비스
-          </GatedLink>
+          {/*
+            * 자문·일임사 사이트로 나가는 유일한 출구. 주소가 설정돼
+            * 있을 때만 렌더한다 — 자문업 등록 전에는 링크 자체가 없다
+            * (config/company.ts 의 경고 참고).
+            */}
+          {COMPANY.advisorySiteUrl && (
+            <a
+              href={COMPANY.advisorySiteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-ink-sub hover:text-brand"
+            >
+              자문 서비스
+            </a>
+          )}
         </nav>
 
         <div className="flex flex-col gap-4 text-[12px] leading-[1.7] text-ink-sub">

@@ -1,14 +1,22 @@
 // ─────────────────────────────────────────────────────────────
-// 트랙 분리와 기능 게이트 — TECH_SPEC §9.6 / PRD §3
+// 커뮤니티 기능 레지스트리 — PRD §3
 //
-// 핵심은 커뮤니티 트랙 기능에 게이트를 걸 수 없게 만드는 것이다.
-// CommunityFeature 는 GateState 가 아니라 'live' 리터럴만 받으므로,
-// 규제 상태와 무관해야 할 기능이 실수로 막히면 컴파일이 깨진다.
+// 이 저장소에는 **규제 게이트가 없다.** 자문사 트랙(자문사 소개·자문
+// 서비스 안내·리서치 게시판)을 2026-09-09 에 별도 웹사이트로 내보냈고
+// (PRD O-9), 그 결과 이 사이트는 전부 커뮤니티 트랙이 되었다.
+// 옮긴 자료는 ADVISORY_TRACK_MOVED.md 에 있다.
+//
+// 그래서 이 파일이 남아서 하는 일은 하나다 —
+// **PRD §3.3 금지 기능의 키를 만들지 못하게 지키는 것.**
+// features.test.ts 가 그것을 검사한다.
 // ─────────────────────────────────────────────────────────────
 
-export type GateState = "hidden" | "under_construction" | "live";
-
-/** 커뮤니티 트랙 — 규제 게이트 없음. 항상 live (PRD §3.2 불변조건) */
+/**
+ * 커뮤니티 기능. 전부 규제 게이트 없이 공개된다 (PRD §3.2 불변조건).
+ *
+ * 여기 없는 기능을 만들 때는 먼저 PRD §3.2 I-1~I-5 에 비춰 본다.
+ * 걸리면 키를 만들지 말고 자문사 사이트로 보낸다.
+ */
 export type CommunityFeature =
   | "board" //            게시판·댓글
   | "serviceAbout" //     서비스 소개 /about
@@ -29,86 +37,41 @@ export type CommunityFeature =
   | "liveChat" //         실시간 채팅        (Phase 5)
   | "bannerAds"; //       배너 광고          (Phase 5)
 
-/** 자문사 트랙 — 규제 게이트 적용 */
-export type AdvisoryFeature =
-  | "companyIntro" //  자문사 소개 /company
-  | "advisoryIntro" // 자문 서비스 안내 /advisory
-  | "researchBoard"; // 리서치 게시판        (Phase 4)
-
-export type FeatureKey = CommunityFeature | AdvisoryFeature;
-
-/**
- * 'live' 리터럴 타입에 주의 — 여기에 'hidden' 을 쓰면 컴파일 에러다.
- * 의도한 제약이며 우회하지 않는다.
- *
- * phase 는 개발 순서 기록용이며 런타임 판정에 쓰지 않는다.
- * 아직 만들지 않은 기능은 코드가 없으므로 라우트도 없다.
- */
-const COMMUNITY: Record<
-  CommunityFeature,
-  { state: "live"; phase: number }
-> = {
-  board: { state: "live", phase: 1 },
-  serviceAbout: { state: "live", phase: 1 },
-  policyPages: { state: "live", phase: 1 },
-  reactions: { state: "live", phase: 2 },
-  search: { state: "live", phase: 2 },
-  uploads: { state: "live", phase: 2 },
-  notifications: { state: "live", phase: 2 },
-  reports: { state: "live", phase: 2 },
-  activityTiers: { state: "live", phase: 3 },
-  tags: { state: "live", phase: 3 },
-  stockPages: { state: "live", phase: 3 },
-  trendingStocks: { state: "live", phase: 3 },
-  newsBoard: { state: "live", phase: 4 },
-  newsFeed: { state: "live", phase: 4 },
-  disclosures: { state: "live", phase: 4 },
-  watchlist: { state: "live", phase: 4 },
-  liveChat: { state: "live", phase: 5 },
-  bannerAds: { state: "live", phase: 5 },
+/** phase 는 개발 순서 기록용이며 런타임 판정에 쓰지 않는다. */
+const COMMUNITY: Record<CommunityFeature, { phase: number }> = {
+  board: { phase: 1 },
+  serviceAbout: { phase: 1 },
+  policyPages: { phase: 1 },
+  reactions: { phase: 2 },
+  search: { phase: 2 },
+  uploads: { phase: 2 },
+  notifications: { phase: 2 },
+  reports: { phase: 2 },
+  activityTiers: { phase: 3 },
+  tags: { phase: 3 },
+  stockPages: { phase: 3 },
+  trendingStocks: { phase: 3 },
+  newsBoard: { phase: 4 },
+  newsFeed: { phase: 4 },
+  disclosures: { phase: 4 },
+  watchlist: { phase: 4 },
+  liveChat: { phase: 5 },
+  bannerAds: { phase: 5 },
 };
 
-const ADVISORY: Record<
-  AdvisoryFeature,
-  { state: GateState; unblockedBy: string }
-> = {
-  companyIntro: {
-    state: "under_construction",
-    unblockedBy: "법인 설립 완료",
-  },
-  advisoryIntro: {
-    state: "hidden",
-    unblockedBy: "자문업 신고·등록 완료",
-  },
-  researchBoard: {
-    state: "hidden",
-    unblockedBy: "자문업 신고·등록 완료",
-  },
-};
-
-export const isCommunityFeature = (k: FeatureKey): k is CommunityFeature =>
+export const isCommunityFeature = (k: string): k is CommunityFeature =>
   k in COMMUNITY;
 
-export function gate(k: FeatureKey): GateState {
-  return isCommunityFeature(k) ? COMMUNITY[k].state : ADVISORY[k].state;
-}
-
-export function unblockedBy(k: AdvisoryFeature): string {
-  return ADVISORY[k].unblockedBy;
-}
-
-export const isLive = (k: FeatureKey) => gate(k) === "live";
-export const isVisible = (k: FeatureKey) => gate(k) !== "hidden";
+export const featurePhase = (k: CommunityFeature): number => COMMUNITY[k].phase;
 
 /**
- * PRD §3.3 금지 기능은 CommunityFeature 에 **키 자체를 만들지 않는다.**
- * 필요해지면 AdvisoryFeature 로 추가하고 게이트를 건다.
+ * PRD §3.3 금지 기능은 여기에 **키 자체를 만들지 않는다.**
  *
  *   수익률 인증·랭킹 · 종목 추천 목록 · 매매 신호 · 목표가 ·
- *   종목 진단 점수/등급 · **모든 형태의 유료 구독·멤버십**
+ *   종목 진단 점수/등급 · 모든 형태의 유료 구독·멤버십
  *
  * `paidResearch`(유료 투자정보 멤버십)와 `perkSubscription`(커뮤니티 편의
- * 구독)은 **PRD v0.4 에서 삭제됐다.** 이 서비스는 이용자에게 요금을 받지
+ * 구독)은 PRD v0.4 에서 삭제됐다. 이 서비스는 이용자에게 요금을 받지
  * 않는다 (I-2) — 커뮤니티는 자문·일임 사업으로 가는 유입 경로이고, 수익은
  * `bannerAds` 하나뿐이다. 다시 넣으려면 PRD §3.2 I-2 부터 고쳐야 한다.
  *

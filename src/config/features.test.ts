@@ -1,19 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
-  gate,
+  featurePhase,
   isCommunityFeature,
-  isLive,
-  isVisible,
-  type AdvisoryFeature,
   type CommunityFeature,
 } from "./features";
 
 /**
- * 트랙 분리 검증 (PRD §3).
+ * 기능 레지스트리 검증 (PRD §3).
  *
- * 이 테스트의 목적은 두 방향을 동시에 막는 것이다.
- *   - 자문사 기능이 실수로 공개되는 것
- *   - **커뮤니티 기능이 실수로 막히는 것** ← 이쪽이 더 조용히 일어난다
+ * 자문사 트랙을 별도 웹사이트로 내보낸 뒤(PRD O-9) 이 저장소에는 규제
+ * 게이트가 없다. 그래서 이 테스트가 지키는 것은 하나다 —
+ * **금지 기능(§3.3)의 키가 커뮤니티에 생기지 않는 것.**
  */
 
 const COMMUNITY: CommunityFeature[] = [
@@ -37,79 +34,54 @@ const COMMUNITY: CommunityFeature[] = [
   "bannerAds",
 ];
 
-const ADVISORY: AdvisoryFeature[] = [
-  "companyIntro",
-  "advisoryIntro",
-  "researchBoard",
-];
-
-describe("커뮤니티 트랙은 규제로 막히지 않는다", () => {
-  it.each(COMMUNITY)("%s 는 항상 live 다", (key) => {
-    expect(gate(key)).toBe("live");
-    expect(isLive(key)).toBe(true);
-    expect(isVisible(key)).toBe(true);
+describe("커뮤니티 기능 레지스트리", () => {
+  it.each(COMMUNITY)("%s 는 등록되어 있다", (key) => {
+    expect(isCommunityFeature(key)).toBe(true);
   });
 
-  it("커뮤니티 기능으로 인식된다", () => {
-    for (const k of COMMUNITY) expect(isCommunityFeature(k), k).toBe(true);
-  });
-});
-
-describe("자문사 트랙은 게이트를 통과해야 공개된다", () => {
-  it("자문사 기능으로 인식된다 (커뮤니티가 아니다)", () => {
-    for (const k of ADVISORY) expect(isCommunityFeature(k), k).toBe(false);
-  });
-
-  it.each(ADVISORY)("%s 는 3단계 중 하나의 상태를 갖는다", (key) => {
-    expect(["hidden", "under_construction", "live"]).toContain(gate(key));
+  it.each(COMMUNITY)("%s 는 페이즈가 기록되어 있다", (key) => {
+    expect(featurePhase(key)).toBeGreaterThanOrEqual(1);
   });
 
   /**
-   * 인허가 전 현재 상태를 고정한다. 아래가 깨지면 규제 게이트가 열린
-   * 것이므로, 인허가가 실제로 완료되었는지 확인한 뒤에만 기대값을 고친다.
+   * Phase 5 로 끝낸다 (PRD §12). 6 이 나오면 로드맵이 늘어난 것이므로
+   * PRD 부터 고친다.
    */
-  it("인허가 전에는 자문 관련 기능이 공개되지 않는다", () => {
-    expect(gate("advisoryIntro")).toBe("hidden");
-    expect(gate("researchBoard")).toBe("hidden");
-  });
-
-  it("법인 설립 전 자문사 소개는 준비 중이다", () => {
-    expect(gate("companyIntro")).toBe("under_construction");
-  });
-
-  it("hidden 은 보이지도 않는다", () => {
-    expect(isVisible("advisoryIntro")).toBe(false);
-    expect(isLive("advisoryIntro")).toBe(false);
-  });
-
-  it("under_construction 은 보이지만 live 는 아니다", () => {
-    expect(isVisible("companyIntro")).toBe(true);
-    expect(isLive("companyIntro")).toBe(false);
+  it("페이즈는 1~5 안에 있다", () => {
+    for (const k of COMMUNITY) {
+      expect(featurePhase(k), k).toBeLessThanOrEqual(5);
+    }
   });
 });
 
 describe("금지 기능 (PRD §3.3)", () => {
   /**
-   * 수익률 인증·랭킹, 종목 추천, 매매 신호는 커뮤니티 트랙에 키를 만들지
-   * 않는다. 누군가 추가하면 이 테스트가 깨진다.
+   * 아래 키가 커뮤니티 기능으로 등록되면 이 테스트가 깨진다.
+   * 깨졌다면 기능을 되돌리거나, 정말 필요하면 PRD §3.2 불변조건부터
+   * 고치고 근거를 남긴다.
    */
   const FORBIDDEN = [
+    // I-4 — 수익률 표방
     "returnRanking",
     "profitVerification",
+    "accountSync",
+    // I-3 — 운영 주체가 종목을 고르는 것
     "stockRecommendation",
     "tradingSignal",
-    "accountSync",
-    // 종목 진단 점수 — 지표를 보여주는 것과 달리 점수는 운영 주체의
-    // 판단으로 읽힌다 (PRD v0.4 §3.3)
     "stockScore",
-    // 유료화 — PRD v0.4 에서 전면 제외. 이 서비스는 무료다 (I-2)
+    "targetPrice",
+    // I-2 — 이용자에게 요금을 받는 것 (PRD v0.4 에서 전면 제외)
     "paidResearch",
     "perkSubscription",
     "paidSubscription",
     "membership",
+    // 자문사 트랙 — 별도 웹사이트로 내보냈다 (O-9)
+    "companyIntro",
+    "advisoryIntro",
+    "researchBoard",
   ];
 
   it.each(FORBIDDEN)("%s 는 커뮤니티 기능으로 등록되어 있지 않다", (key) => {
-    expect(isCommunityFeature(key as CommunityFeature)).toBe(false);
+    expect(isCommunityFeature(key)).toBe(false);
   });
 });
