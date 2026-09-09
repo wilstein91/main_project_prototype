@@ -25,17 +25,22 @@ const COMMUNITY: CommunityFeature[] = [
   "uploads",
   "notifications",
   "reports",
-  "tags",
   "activityTiers",
-  "perkSubscription",
+  "tags",
+  "stockPages",
+  "trendingStocks",
+  "newsBoard",
+  "newsFeed",
+  "disclosures",
+  "watchlist",
   "liveChat",
+  "bannerAds",
 ];
 
 const ADVISORY: AdvisoryFeature[] = [
   "companyIntro",
   "advisoryIntro",
   "researchBoard",
-  "paidResearch",
 ];
 
 describe("커뮤니티 트랙은 규제로 막히지 않는다", () => {
@@ -66,7 +71,6 @@ describe("자문사 트랙은 게이트를 통과해야 공개된다", () => {
   it("인허가 전에는 자문 관련 기능이 공개되지 않는다", () => {
     expect(gate("advisoryIntro")).toBe("hidden");
     expect(gate("researchBoard")).toBe("hidden");
-    expect(gate("paidResearch")).toBe("hidden");
   });
 
   it("법인 설립 전 자문사 소개는 준비 중이다", () => {
@@ -95,6 +99,14 @@ describe("금지 기능 (PRD §3.3)", () => {
     "stockRecommendation",
     "tradingSignal",
     "accountSync",
+    // 종목 진단 점수 — 지표를 보여주는 것과 달리 점수는 운영 주체의
+    // 판단으로 읽힌다 (PRD v0.4 §3.3)
+    "stockScore",
+    // 유료화 — PRD v0.4 에서 전면 제외. 이 서비스는 무료다 (I-2)
+    "paidResearch",
+    "perkSubscription",
+    "paidSubscription",
+    "membership",
   ];
 
   it.each(FORBIDDEN)("%s 는 커뮤니티 기능으로 등록되어 있지 않다", (key) => {

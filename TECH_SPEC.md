@@ -719,17 +719,22 @@ export type CommunityFeature =
   | 'uploads'        // 이미지 업로드    (Phase 2)
   | 'notifications'  // 인앱 알림        (Phase 2)
   | 'reports'        // 신고·임시조치    (Phase 2)
+  | 'activityTiers'  // 회원 등급        (Phase 3)
   | 'tags'           // 종목 태그        (Phase 3)
-  | 'activityTiers'  // 활동 기반 등급   (Phase 3)
-  | 'perkSubscription' // 커뮤니티 편의 구독 (Phase 4)
-  | 'liveChat'       // 실시간 채팅      (Phase 4)
+  | 'stockPages'     // 종목 페이지·시세 (Phase 3)
+  | 'trendingStocks' // 화제 종목 (집계) (Phase 3)
+  | 'newsBoard'      // 뉴스 공유 게시판 (Phase 4)
+  | 'newsFeed'       // 뉴스 자동 수집   (Phase 4)
+  | 'disclosures'    // 공시·캘린더      (Phase 4)
+  | 'watchlist'      // 관심 종목        (Phase 4)
+  | 'liveChat'       // 실시간 채팅      (Phase 5)
+  | 'bannerAds'      // 배너 광고        (Phase 5)
 
 // ── 자문사 트랙 ── 규제 게이트 적용
 export type AdvisoryFeature =
   | 'companyIntro'   // 자문사 소개 /company
   | 'advisoryIntro'  // 자문 서비스 안내 /advisory
-  | 'researchBoard'  // 리서치 게시판     (Phase 3)
-  | 'paidResearch'   // 유료 투자정보 멤버십 (Phase 4)
+  | 'researchBoard'  // 리서치 게시판     (Phase 4)
 
 export type FeatureKey = CommunityFeature | AdvisoryFeature
 
@@ -746,18 +751,26 @@ const COMMUNITY: Record<CommunityFeature, { state: 'live'; phase: number }> = {
   uploads:          { state: 'live', phase: 2 },
   notifications:    { state: 'live', phase: 2 },
   reports:          { state: 'live', phase: 2 },
-  tags:             { state: 'live', phase: 3 },
   activityTiers:    { state: 'live', phase: 3 },
-  perkSubscription: { state: 'live', phase: 4 },
-  liveChat:         { state: 'live', phase: 4 },
+  tags:             { state: 'live', phase: 3 },
+  stockPages:       { state: 'live', phase: 3 },
+  trendingStocks:   { state: 'live', phase: 3 },
+  newsBoard:        { state: 'live', phase: 4 },
+  newsFeed:         { state: 'live', phase: 4 },
+  disclosures:      { state: 'live', phase: 4 },
+  watchlist:        { state: 'live', phase: 4 },
+  liveChat:         { state: 'live', phase: 5 },
+  bannerAds:        { state: 'live', phase: 5 },
 }
 
 const ADVISORY: Record<AdvisoryFeature, { state: GateState; unblockedBy: string }> = {
   companyIntro:  { state: 'under_construction', unblockedBy: '법인 설립 완료' },
   advisoryIntro: { state: 'hidden',             unblockedBy: '자문업 신고·등록 완료' },
   researchBoard: { state: 'hidden',             unblockedBy: '자문업 신고·등록 완료' },
-  paidResearch:  { state: 'hidden',             unblockedBy: '자문업 등록 + 결제 심사' },
 }
+
+// PRD v0.4: 유료 구독·멤버십(perkSubscription / paidResearch)은 삭제됐다.
+// 이 서비스는 이용자에게 요금을 받지 않는다 (I-2). 수익은 bannerAds 뿐이다.
 
 export const isCommunityFeature = (k: FeatureKey): k is CommunityFeature =>
   k in COMMUNITY
