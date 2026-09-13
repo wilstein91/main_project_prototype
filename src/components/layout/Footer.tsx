@@ -20,7 +20,7 @@ import { FOOTER_NOTICE } from "@/config/legal";
  */
 export function Footer() {
   return (
-    <footer className="mt-12 border-t border-line bg-surface">
+    <footer className="mt-12 border-t border-gold-dim bg-surface/60">
       <div className="mx-auto max-w-[1200px] px-4 py-10 lg:px-6">
         <nav
           aria-label="사이트 정보"
@@ -77,7 +77,7 @@ export function Footer() {
         </dl>
 
         {isPreIncorporation() && (
-          <p className="mt-6 rounded-[var(--radius-sm)] bg-canvas px-4 py-3 text-[12px] leading-relaxed text-ink-sub">
+          <p className="mt-6 rounded-[var(--radius-sm)] border border-line bg-canvas px-4 py-3 text-[12px] leading-relaxed text-ink-sub">
             본 서비스는 시험 운영 중입니다. 법인 설립 및 자문업 신고·등록 절차가
             완료되지 않았으며, 사업자 정보는 절차 완료 후 게재됩니다.
           </p>

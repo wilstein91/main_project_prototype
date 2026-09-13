@@ -20,14 +20,12 @@ export default async function HomePage() {
       {!viewer && <HomeHero />}
 
       <div
-        className={`lg:border lg:border-line lg:bg-canvas ${
-          viewer
-            ? "lg:rounded-[var(--radius-md)]"
-            : "lg:rounded-b-[var(--radius-md)] lg:border-t-0"
+        className={`lg:panel ${
+          viewer ? "" : "lg:rounded-t-none lg:border-t-0"
         }`}
       >
         <div className="border-b border-line px-4 py-4 lg:px-6">
-          <Heading className="text-title font-bold text-ink">최신글</Heading>
+          <Heading className="serif title-mark text-title font-bold text-gold-lit">최신글</Heading>
           {/* 띠가 이미 같은 말을 했으면 반복하지 않는다 */}
           {viewer && (
             <p className="mt-0.5 text-meta text-ink-sub">{COMPANY.tagline}</p>

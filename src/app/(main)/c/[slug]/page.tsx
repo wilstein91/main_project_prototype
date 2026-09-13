@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PostList } from "@/components/post/PostList";
 import { ButtonLink } from "@/components/ui/Button";
 import { Empty } from "@/components/ui/Empty";
+import { artwork } from "@/lib/art";
 import {
   getCategoryBySlug,
   getPosts,
@@ -30,17 +31,36 @@ export default async function CategoryPage({
   const category = await getCategoryBySlug(slug);
   if (!category) notFound();
 
+  const banner = artwork(`cat-${category.slug}`);
   const page = Math.max(1, Number(pageParam ?? 1) || 1);
   const { items, total } = await getPosts({ categoryId: category.id, page });
   const totalPages = Math.max(1, Math.ceil(total / POSTS_PER_PAGE));
 
   return (
-    <div className="lg:rounded-[var(--radius-md)] lg:border lg:border-line lg:bg-canvas">
-      <div className="flex items-start justify-between gap-3 border-b border-line px-4 py-4 lg:px-6">
-        <div className="min-w-0">
-          <h1 className="text-title font-bold text-ink">{category.name}</h1>
+    <div className="lg:panel">
+      <div className="relative flex items-end justify-between gap-3 overflow-hidden border-b border-gold-dim px-4 py-5 lg:px-6 lg:py-6">
+        {/* 그 게시판을 그린 배너. 그림이 없으면 평소의 어두운 머리다 */}
+        {banner && (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={banner}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <span
+              aria-hidden
+              className="absolute inset-0 bg-[linear-gradient(90deg,rgba(12,8,4,0.93)_0%,rgba(12,8,4,0.72)_55%,rgba(12,8,4,0.45)_100%)]"
+            />
+          </>
+        )}
+        <div className="relative min-w-0">
+          <h1 className="serif title-mark text-[24px] font-bold text-gold-lit drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
+            {category.name}
+          </h1>
           {category.description && (
-            <p className="mt-0.5 text-meta text-ink-sub">
+            <p className="mt-1 text-meta text-ink-sub drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
               {category.description}
             </p>
           )}
@@ -49,7 +69,7 @@ export default async function CategoryPage({
           <ButtonLink
             href={`/write?category=${category.slug}`}
             size="sm"
-            className="hidden shrink-0 lg:inline-flex"
+            className="relative hidden shrink-0 lg:inline-flex"
           >
             글쓰기
           </ButtonLink>

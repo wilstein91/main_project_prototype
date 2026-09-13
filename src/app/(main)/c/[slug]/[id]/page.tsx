@@ -47,7 +47,7 @@ export default async function PostDetailPage({
   const isAdmin = viewer?.role === "admin";
 
   return (
-    <article className="lg:rounded-[var(--radius-md)] lg:border lg:border-line lg:bg-canvas">
+    <article className="lg:panel">
       {/* 조회수 (F-208) — 쿠키로 같은 방문자의 재조회를 걸러낸다 */}
       <ViewCounter postId={post.id} />
 
@@ -68,25 +68,23 @@ export default async function PostDetailPage({
           >
             {post.category_name}
           </Link>
-          {post.is_pinned && <Badge tone="brand">공지</Badge>}
+          {post.is_pinned && <Badge tone="gold">공지</Badge>}
         </div>
 
-        <h1 className="text-[22px] font-bold leading-snug text-ink">
+        <h1 className="serif text-[26px] font-bold leading-snug text-ink">
           {post.title}
         </h1>
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-meta text-ink-sub">
+        {/*
+          * 가운뎃점으로 잇지 않는다. 목록에서 걷어낸 것과 같은 이유다
+          * (DESIGN.md §6) — 항목이 넷인데 구분자가 셋이면 눈이 점을 센다.
+          * 여백과 굵기로만 나눈다.
+          */}
+        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-meta text-ink-sub">
           <span className="font-semibold text-ink">{post.author_nickname}</span>
-          <span aria-hidden>·</span>
           <span>{formatFullDate(post.created_at)}</span>
-          {post.edited_at && (
-            <>
-              <span aria-hidden>·</span>
-              <span>수정됨</span>
-            </>
-          )}
-          <span aria-hidden>·</span>
-          <span>조회 {formatCount(post.view_count)}</span>
+          {post.edited_at && <span>수정됨</span>}
+          <span className="nums">조회 {formatCount(post.view_count)}</span>
         </div>
 
         {(isMine || isAdmin) && (

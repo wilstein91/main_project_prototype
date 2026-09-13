@@ -51,7 +51,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
 
   return (
     <div>
-      <h1 className="mb-1 text-[24px] font-bold text-ink">로그인</h1>
+      <h1 className="serif mb-1 text-[26px] font-bold text-gold-lit">로그인</h1>
       <p className="mb-6 text-meta text-ink-sub">
         글과 댓글을 쓰려면 로그인이 필요합니다.
       </p>

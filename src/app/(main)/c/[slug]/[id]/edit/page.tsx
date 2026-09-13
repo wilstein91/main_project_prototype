@@ -31,7 +31,7 @@ export default async function EditPostPage({
 
   return (
     <div className="px-4 py-6 lg:px-6 lg:py-0">
-      <h1 className="mb-6 text-title font-bold text-ink">글 수정</h1>
+      <h1 className="serif title-mark mb-6 text-title font-bold text-gold-lit">글 수정</h1>
       <PostForm
         categories={categories}
         isAdmin={viewer.role === "admin"}

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { BladeCrest } from "@/components/brand/BladeCrest";
+import { Seal } from "@/components/brand/Scenery";
+import { CloudRule } from "@/components/brand/Ornaments";
 
 /**
  * 빈 상태는 공백으로 두지 않는다 (TECH_SPEC §9.4).
@@ -20,7 +21,8 @@ export function Empty({
 }) {
   return (
     <div className="flex flex-col items-center gap-3 px-6 py-14 text-center">
-      <BladeCrest size={76} className="opacity-40" />
+      <Seal size={46} className="opacity-70" />
+      <CloudRule className="h-4 w-[200px] opacity-60" />
       <p className="text-list font-semibold text-ink">{title}</p>
       {description && (
         <p className="max-w-xs text-meta leading-relaxed text-ink-sub">

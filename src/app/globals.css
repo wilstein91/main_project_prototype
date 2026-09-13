@@ -7,47 +7,76 @@
    ───────────────────────────────────────────────────────────── */
 @theme {
   /* ── 색 ──────────────────────────────────────────────────────
-     브랜드색은 청록이다. 이유가 둘 겹친다.
-       1) 청룡언월도의 '청' — 로고와 색이 같은 출처를 갖는다
-       2) 한국 시세는 상승=빨강, 하락=파랑이다. 그 둘은 시세 의미에
-          예약해야 하므로 브랜드색으로 쓸 수 없다. 청록은 한국 시세
-          표기에서 비어 있는 자리라 의미 충돌이 없다
+     "만화 삼국지 컬러판" 을 화면 전체로 끌어올린 배색이다.
+
+     v1.1 까지는 흰 바탕 + 청록 포인트였고, 먹·금·주홍은 **로고 안에만**
+     가둬 두었다 ("UI 크롬에 쓰면 화면이 금방 무거워진다"). v1.2 에서 그
+     빗장을 풀었다 — 이제 로고와 화면이 같은 출처를 갖는다.
+
+     명도를 뒤집되 **색상(hue)은 그대로 둔다.** 청록은 여전히 브랜드색이고
+     (DESIGN.md §4.2 의 근거는 그대로 유효하다), 어두운 바탕에서 보이도록
+     밝은 쪽 청록(로고 날 색)을 쓴다.
+
+     ⚠️ 값을 고칠 때는 반드시 대비를 다시 잰다. 어두운 바탕에서는 눈으로
+     "보인다" 와 "읽힌다" 의 간극이 훨씬 크다 (DESIGN.md §8.1).
      ────────────────────────────────────────────────────────── */
-  --color-canvas: #ffffff;
-  --color-surface: #f2f5f4;
-  --color-line: #e0e6e4;
-  /* 입력칸 테두리. --line 은 흰 바탕에서 1.26:1 이라 경계로 보이지 않는다.
-     읽는 데 쓰는 구분선과 달리 입력칸의 테두리는 "여기가 입력하는 자리"
-     라는 정보이므로 3:1 을 넘겨야 한다 (WCAG 1.4.11). 3.36:1. */
-  --color-field: #828f8c;
-  --color-ink: #15201f;
-  --color-ink-sub: #5e6c69;
-  --color-brand: #0f6e63;
-  --color-brand-strong: #0b5a51; /* 주요 버튼 hover */
-  --color-brand-soft: #e4f0ee;
-  --color-danger: #c0392f;
+  --color-canvas: #171009; /* 가장 깊은 바탕 — 먹에 갈색 */
+  --color-surface: #241a10; /* 패널·면 — 따뜻한 갈색 */
+  --color-surface-lit: #322415; /* hover·입력칸 안쪽 */
+  --color-line: #43331f; /* 구분선 (읽기용 — 낮아도 된다) */
+  /* 입력칸 테두리. --line 은 바탕 대비 1.47:1 이라 경계로 보이지 않는다.
+     "여기가 입력하는 자리" 는 장식이 아니라 정보이므로 3:1 을 넘긴다
+     (WCAG 1.4.11). 3.51:1 */
+  --color-field: #7a6752;
+
+  --color-ink: #f2ece0; /* 본문 — 바탕 대비 16.1:1 */
+  --color-ink-sub: #b5a892; /* 보조 — 8.1:1, 청록면 위 5.8:1 */
+
+  --color-brand: #4bb8aa; /* 링크·강조 — 7.9:1 */
+  --color-brand-strong: #7fc9be; /* hover — 9.9:1 */
+  --color-brand-soft: #17332f; /* 활성 카테고리·배지 바탕 */
+  --color-danger: #e5705f; /* 삭제·오류 — 6.1:1 */
+
+  /* ── 금 ─────────────────────────────────────────────────────
+     프레임과 장식의 색이다. 게임 UI 의 금테를 여기서 가져온다.
+     --gold 는 테두리용(6.9:1), --gold-lit 은 글자로 써도 되는 밝기(12:1).
+     ────────────────────────────────────────────────────────── */
+  --color-gold: #c8922a;
+  --color-gold-lit: #eccb72;
+  --color-gold-dim: #6b5020; /* 은은한 프레임 — 늘 번쩍이지 않게 */
+
+  /* ── 양피지 ───────────────────────────────────────────────
+     메뉴판의 색이다. 어두운 화면에서 **메뉴만 밝게** 띄우면 어디를
+     눌러야 하는지가 한눈에 보인다 — 게임 UI 가 메뉴를 밝은 판으로
+     두는 이유가 이것이다. 판 위 글자는 먹색이라 대비가 13:1 을 넘는다.
+     ────────────────────────────────────────────────────── */
+  --color-paper: #e8dcc0;
+  --color-paper-lit: #f6eed8; /* 판 위쪽 하이라이트 */
+  --color-paper-dim: #c9b98f; /* 판 아래쪽 그늘 */
+  --color-paper-ink: #241a10; /* 판 위의 글자 */
 
   /* ── 로고·삽화 전용 ─────────────────────────────────────────
-     만화 삼국지 컬러판의 배색이다. 먹선 + 평면 채움에 금과 주홍을
-     얹는다. UI 크롬(버튼·배경·테두리)에는 쓰지 않는다 — 여기에 쓰면
-     화면이 금방 무거워진다. 마크와 삽화 안에서만 쓴다.
+     어두운 바탕으로 뒤집히면서 **윤곽선이 밝은 쪽**이 되었다. 만화
+     컬러판에서 흰 바탕에 먹선을 긋던 것을, 검은 바탕에 흰선을 긋는
+     쪽으로 바꾼 것이다. 날·투겁·술의 색은 그대로다 — 색은 명도를
+     뒤집어도 정체성이 남는다.
      ────────────────────────────────────────────────────────── */
-  --color-ink-lit: #3a4a48; /* 먹선 위 밝은 결 */
-  --color-blade: #3fa79a; /* 날 하이라이트 */
+  --color-blade: #3fa79a; /* 날 */
   --color-blade-lit: #7fc9be; /* 날 끝 */
-  --color-gold: #c8922a; /* 투겁·물미 */
-  --color-gold-lit: #eccb72;
   --color-tassel: #c0392f; /* 술 */
   --color-tassel-dark: #8e2018;
+  --color-ink-lit: #b9b2a4; /* 윤곽선 위 결 */
 
   /* 개발 모드 경고 배너 */
-  --color-warn: #f0c14b;
-  --color-warn-soft: #fff8e1;
-  --color-warn-ink: #7a5c00;
+  --color-warn: #6b5520;
+  --color-warn-soft: #2a2113;
+  --color-warn-ink: #f0c14b; /* 9.4:1 */
 
-  /* ── 예약: Phase 2 이후 시세 표기용. UI 크롬에 쓰지 않는다 ── */
-  --color-up: #e02b3c; /* 상승 (한국 관례) */
-  --color-down: #1b64c8; /* 하락 */
+  /* ── 예약: Phase 2 이후 시세 표기용. UI 크롬에 쓰지 않는다 ──
+     어두운 바탕에서 읽히도록 밝은 쪽으로 옮겼다. 상승=빨강,
+     하락=파랑이라는 한국 관례는 그대로다. */
+  --color-up: #ef5a68; /* 상승 — 5.7:1 */
+  --color-down: #4d8fe8; /* 하락 — 5.8:1 */
 
   /* ── 타이포 — 본문은 15px 아래로 내리지 않는다 ────────────── */
   --text-display: 26px;
@@ -69,14 +98,22 @@
   --radius-sm: 8px;
   --radius-md: 12px;
 
-  /* Pretendard 는 src/app/fonts.css 에서 자체 호스팅한다 */
+  /* 본문 — Pretendard (src/app/fonts.css) */
   --font-sans: "Pretendard Variable", Pretendard, -apple-system,
     BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Malgun Gothic",
     sans-serif;
+
+  /*
+   * 제목·메뉴·버튼 — 나눔명조 (src/app/fonts-myeongjo.css).
+   * 궁서체는 웹에 쓸 수 없다 (윈도우 '궁서'는 임베드 불가). 나눔명조는
+   * SIL OFL 이라 임베드·재배포가 모두 허용된다.
+   * 본문에는 쓰지 않는다 — 긴 글을 명조로 읽히면 눈이 빨리 지친다.
+   */
+  --font-serif: "Nanum Myeongjo", "Batang", "바탕", serif;
 }
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 html {
@@ -85,7 +122,19 @@ html {
 }
 
 body {
+  /*
+   * 평면 검정이 아니라 위가 살짝 밝은 바탕이다. 게임 화면의 깊이감이
+   * 여기서 나온다. DESIGN.md §9 의 "그라디언트 장식 금지" 는 버튼·카드
+   * 하나하나에 그라디언트를 넣지 말라는 뜻이고, 화면 전체의 바탕 한 겹은
+   * 그 금지 대상이 아니다 (v1.2 에서 명시).
+   */
   background: var(--color-canvas);
+  background-image: radial-gradient(
+    120% 80% at 50% 0%,
+    #241d15 0%,
+    var(--color-canvas) 60%
+  );
+  background-attachment: fixed;
   color: var(--color-ink);
   font-family: var(--font-sans);
   font-size: var(--text-body);
@@ -130,6 +179,168 @@ textarea:focus-visible,
   summary {
     min-height: 44px;
   }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   금테 패널 — 게임 화면의 대사 박스에 해당한다 (DESIGN.md §10).
+
+   테두리 한 겹으로 끝낸다. 안쪽 그림자·바깥 광원·이중 테두리를 겹치면
+   카드 하나가 액자가 되고, 목록처럼 카드가 여러 개 쌓이는 화면에서
+   글보다 액자가 먼저 읽힌다.
+
+   윗변만 금색을 진하게 준다 — 빛이 위에서 온다는 한 방향만 지키면
+   금속처럼 보이고, 사방을 다 밝히면 스티커가 된다.
+   ───────────────────────────────────────────────────────────── */
+@utility panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-gold-dim);
+  border-top-color: var(--color-gold);
+  border-radius: var(--radius-md);
+}
+
+/*
+ * 제목 띠 — 게임 상단 중앙의 제목 패널. 화면 제목에만 쓰고 목록 행에는
+ * 쓰지 않는다. 좌우 금색 실선이 글자 쪽으로 갈수록 옅어진다.
+ */
+@utility rule-gold {
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-gold) 35%,
+    var(--color-gold) 65%,
+    transparent
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
+   명판 — 인터페이스를 '글자에 링크' 가 아니라 '금속 판 위의 글자' 로
+   만든다 (DESIGN.md §10.6).
+
+   ## 어떻게 만드나
+
+   테두리를 그라디언트로 칠하려면 `border-image` 를 쓰게 되는데 그러면
+   `border-radius` 가 죽는다. 대신 **배경 두 장을 겹친다** —
+   안쪽(padding-box)은 판 색, 바깥(border-box)은 금속 그라디언트.
+   테두리는 투명하게 두면 바깥 배경이 테두리 자리에 비친다.
+
+   ## 왜 위가 밝고 아래가 어두운가
+
+   빛이 위에서 온다는 한 방향만 지키면 금속으로 읽힌다. 안쪽 위의 밝은
+   선(inset highlight)과 아래의 그림자가 판을 도드라지게 한다.
+   ───────────────────────────────────────────────────────────── */
+@utility plaque {
+  background:
+    linear-gradient(180deg, #2b2117 0%, #1d1610 55%, #15100b 100%) padding-box,
+    linear-gradient(180deg, #f0d9a0 0%, #c8922a 38%, #7d5610 78%, #4a3209 100%)
+      border-box;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  box-shadow:
+    inset 0 1px 0 rgba(240, 217, 160, 0.28),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.55),
+    0 2px 8px rgba(0, 0, 0, 0.55);
+}
+
+/* 눌린 상태 — 지금 보고 있는 메뉴. 청록이 안쪽에서 배어 나온다 */
+@utility plaque-on {
+  background:
+    linear-gradient(180deg, #1b4a44 0%, #123531 55%, #0d2523 100%) padding-box,
+    linear-gradient(180deg, #f7e7bd 0%, #e0b451 40%, #a8781f 100%) border-box;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 0 rgba(240, 217, 160, 0.22),
+    0 0 10px rgba(75, 184, 170, 0.18);
+}
+
+/* 주요 행동 — 청록 에나멜을 금테에 물린다 */
+@utility plaque-brand {
+  background:
+    linear-gradient(180deg, #6fd3c4 0%, #4bb8aa 45%, #2c8377 100%) padding-box,
+    linear-gradient(180deg, #f7e7bd 0%, #c8922a 45%, #7d5610 100%) border-box;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   양피지 명판 — 좌측 메뉴판 (DESIGN.md §10.8)
+
+   어두운 화면에서 **메뉴만 밝다.** 어디를 눌러야 하는지가 한눈에
+   보이고, 판 위 먹색 글자는 대비가 13:1 을 넘어 작은 글씨도 또렷하다.
+   ───────────────────────────────────────────────────────────── */
+@utility paper {
+  background:
+    linear-gradient(
+        180deg,
+        var(--color-paper-lit) 0%,
+        var(--color-paper) 42%,
+        var(--color-paper-dim) 100%
+      )
+      padding-box,
+    linear-gradient(180deg, #f0d9a0 0%, #c8922a 45%, #7d5610 100%) border-box;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -2px 4px rgba(122, 95, 48, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.55);
+  color: var(--color-paper-ink);
+}
+
+/* 지금 보고 있는 메뉴 — 판이 청록으로 물든다 */
+@utility paper-on {
+  background:
+    linear-gradient(180deg, #bfe3dc 0%, #8fc9bf 45%, #5c9e92 100%) padding-box,
+    linear-gradient(180deg, #f7e7bd 0%, #e0b451 40%, #a8781f 100%) border-box;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -2px 5px rgba(20, 60, 55, 0.4),
+    0 0 12px rgba(75, 184, 170, 0.25);
+  color: #0d2320;
+}
+
+/* 명조 — 제목·메뉴·버튼 */
+@utility serif {
+  font-family: var(--font-serif);
+}
+
+/*
+ * 화면 제목 앞의 금색 표식. 게임에서 각 항목 앞에 붙는 장식에 해당한다.
+ * 제목을 명판 프레임으로 감싸는 것도 해 봤지만, 목록·글쓰기·내 정보처럼
+ * 제목이 매번 나오는 화면에서 프레임이 반복되면 그것대로 시끄러웠다.
+ * 왼쪽 3px 한 줄이면 "여기가 이 화면의 머리" 라는 말은 충분히 된다.
+ */
+@utility title-mark {
+  position: relative;
+  padding-left: 14px;
+}
+@utility title-mark {
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.18em;
+    bottom: 0.18em;
+    width: 3px;
+    border-radius: 2px;
+    background: linear-gradient(
+      var(--color-gold-lit),
+      var(--color-gold) 60%,
+      var(--color-gold-dim)
+    );
+  }
+}
+
+/* 스크롤바도 바탕에 맞춘다. 기본 밝은 스크롤바가 남으면 그 줄만 뜬다 */
+* {
+  scrollbar-color: var(--color-line) transparent;
 }
 
 /* 짧은 사용자 텍스트 (댓글) — 마크다운을 적용하지 않는 곳 */
@@ -194,18 +405,18 @@ textarea:focus-visible,
   margin-top: 0.35em;
 }
 .post-body blockquote {
-  border-left: 3px solid var(--color-line);
+  border-left: 3px solid var(--color-gold-dim);
   padding: 0.1em 0 0.1em 1em;
   color: var(--color-ink-sub);
 }
 .post-body code {
-  background: var(--color-surface);
+  background: var(--color-surface-lit);
   border-radius: 4px;
   padding: 0.1em 0.35em;
   font-size: 0.92em;
 }
 .post-body pre {
-  background: var(--color-surface);
+  background: var(--color-surface-lit);
   border-radius: var(--radius-sm);
   padding: 0.9em 1em;
   overflow-x: auto;
@@ -236,6 +447,6 @@ textarea:focus-visible,
   text-align: left;
 }
 .post-body th {
-  background: var(--color-surface);
+  background: var(--color-surface-lit);
   font-weight: 700;
 }

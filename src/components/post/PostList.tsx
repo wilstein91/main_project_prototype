@@ -39,13 +39,13 @@ export function PostList({
         <li key={p.id}>
           <Link
             href={`/c/${p.category_slug}/${p.id}`}
-            className="flex items-start gap-3 px-4 py-4 transition-colors hover:bg-surface lg:gap-4 lg:px-6"
+            className="flex items-start gap-3 px-4 py-4 transition-colors hover:bg-surface-lit lg:gap-4 lg:px-6"
           >
             <div className="min-w-0 flex-1">
               <h3 className="flex items-start gap-1.5 text-list font-semibold leading-snug text-ink">
                 {p.is_pinned && (
                   <span className="mt-px shrink-0">
-                    <Badge tone="brand">공지</Badge>
+                    <Badge tone="gold">공지</Badge>
                   </span>
                 )}
                 <span className="line-clamp-2">{p.title}</span>
@@ -54,7 +54,7 @@ export function PostList({
               {/* 구분자 없이 여백과 굵기로만 나눈다 */}
               <p className="mt-1.5 flex items-center gap-2.5 text-meta text-ink-sub">
                 {showCategory && (
-                  <span className="shrink-0 font-semibold text-brand">
+                  <span className="serif shrink-0 font-bold text-paper-dim">
                     {p.category_name}
                   </span>
                 )}

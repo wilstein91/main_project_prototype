@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-가로형 로고 생성 — public/logo/lockup.svg, public/logo/wordmark.svg
+워드마크 생성 — public/logo/wordmark.svg
 
 ## 왜 스크립트인가
 
@@ -25,8 +25,8 @@
     python scripts/build_logo.py            # 기본: 영웅호걸닷컴
     python scripts/build_logo.py 다른이름     # 이름이 바뀌면
 
-무기 그림은 scripts/_arm.svgfrag 에 있다. 그림을 고치려면 그 파일을
-고치고 이 스크립트를 다시 돌린다.
+화면의 그림(산수·인장)은 src/components/brand/Scenery.tsx 에 있다.
+이 스크립트가 만드는 것은 글자뿐이다.
 """
 import json
 import os
@@ -38,14 +38,22 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CSS_URL = "https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@800&display=swap"
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36"
 
-# 로고 좌표계 (viewBox 900x240) 안에서 워드마크의 자리
-WORD_SIZE = 84.0
-WORD_X = 398.0
-WORD_BASELINE = 170.0
+# 어두운 테마 기준이다 (DESIGN.md §10). 만화 컬러판에서 흰 바탕에 먹선을
+# 긋던 것을, 검은 바탕에 흰선을 긋는 쪽으로 뒤집었다.
+#   word   — 글자 채움. 바탕이 어두우므로 크림색이다
+#   halo   — 쓰지 않는다 (가로형 로고를 없애면서 테두리도 사라졌다)
+# 라이트 테마로 되돌린다면 이 둘을 맞바꾸면 된다.
+# 워드마크는 **세 겹**으로 그린다. 헤더에서 청룡언월도 그림 위에 얹히므로
+# 글자만 있으면 그림에 묻힌다.
+#   halo — 바깥 어두운 외곽선. 어떤 그림 위에서도 글자 모양을 지킨다
+#   rim  — 금테. 삼국지 톤을 글자 자체가 갖게 한다
+#   word — 글자 채움
+PAD = 11  # 외곽선(19)의 절반 + 여유
 
 COLORS = {
-    "ink": "#15201f",
-    "cream": "#fbfaf5",
+    "halo": "#120c06",
+    "rim": "#c8922a",
+    "word": "#f7efdd",
 }
 
 
@@ -169,46 +177,32 @@ def main():
     cache = os.path.join(ROOT, "scripts", ".fontcache")
     glyphs = glyph_outlines(name, cache)
 
-    arm_path = os.path.join(ROOT, "scripts", "_arm.svgfrag")
-    arm = open(arm_path, encoding="utf-8").read()
-
     out_dir = os.path.join(ROOT, "public", "logo")
     os.makedirs(out_dir, exist_ok=True)
 
-    # ── 가로형 로고 (무기 + 워드마크) ──────────────────────────
-    word, end_x = compose(glyphs, name, WORD_SIZE, WORD_X, WORD_BASELINE)
-    lockup = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 240" '
-        f'fill="none" role="img" aria-label="{name}">\n'
-        f"<title>{name}</title>\n{arm}\n"
-        f"<!-- 워드마크 — 나눔명조 ExtraBold(OFL) 윤곽선. "
-        f"scripts/build_logo.py 로 생성했다. 손으로 고치지 말 것 -->\n"
-        f'<path d="{word}" fill="{COLORS["ink"]}" stroke="{COLORS["cream"]}" '
-        f'stroke-width="13" stroke-linejoin="round" paint-order="stroke"/>\n'
-        f"</svg>"
-    )
-    with open(os.path.join(out_dir, "lockup.svg"), "w", encoding="utf-8") as f:
-        f.write(lockup)
+    # 가로형 로고(무기 + 워드마크)는 v1.2.1 에서 없앴다. 마크·삽화·로고가
+    # 전부 같은 언월도 한 자루를 돌려쓰고 있었고, 자리가 넓어질수록 아이콘
+    # 하나는 더 빈약해 보였다. 넓은 자리는 산수(Scenery.tsx)가, 작은 자리는
+    # 인장이 채운다 (DESIGN.md §10.7).
 
     # ── 워드마크 단독 (헤더용) ────────────────────────────────
     word2, end2 = compose(glyphs, name, 100.0, 0.0, 100.0)
     wordmark = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -4 {end2:.0f} 110" '
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{-PAD} {-4 - PAD} {end2 + PAD * 2:.0f} {110 + PAD * 2}" '
         f'fill="none" role="img" aria-label="{name}">\n'
         f"<title>{name}</title>\n"
-        f'<path d="{word2}" fill="{COLORS["ink"]}"/>\n'
+        f'<g stroke-linejoin="round" paint-order="stroke"><path d="{word2}" fill="none" stroke="{COLORS["halo"]}" stroke-width="19"/><path d="{word2}" fill="none" stroke="{COLORS["rim"]}" stroke-width="9"/><path d="{word2}" fill="{COLORS["word"]}"/></g>\n'
         f"</svg>"
     )
     with open(os.path.join(out_dir, "wordmark.svg"), "w", encoding="utf-8") as f:
         f.write(wordmark)
 
-    for fname in ("lockup.svg", "wordmark.svg"):
+    for fname in ("wordmark.svg",):
         size = os.path.getsize(os.path.join(out_dir, fname))
         print(f"  public/logo/{fname}  {size:,} bytes")
-    print(f"  워드마크 끝 x = {end_x:.1f} (900 을 넘으면 잘린다)")
-    if end_x > 900:
-        raise SystemExit("워드마크가 viewBox 를 넘었다. WORD_SIZE 를 줄이거나 "
-                         "WORD_X 를 왼쪽으로 옮길 것")
+    # 워드마크 단독 SVG 는 viewBox 를 글자 폭에 맞춰 잡으므로 잘릴 일이
+    # 없다. 가로형 로고(고정 viewBox 900)를 없애면서 폭 검사도 불필요해졌다.
+    print(f"  워드마크 폭 = {end2:.0f}")
 
 
 if __name__ == "__main__":

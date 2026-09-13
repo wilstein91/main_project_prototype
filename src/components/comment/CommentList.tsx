@@ -22,7 +22,7 @@ export function CommentList({
 
   return (
     <section aria-label="댓글" className="border-t border-line">
-      <h2 className="px-4 pb-1 pt-5 text-list font-bold text-ink lg:px-6">
+      <h2 className="serif title-mark mx-4 pb-1 pt-5 text-[17px] font-bold text-gold-lit lg:mx-6">
         댓글 {total}
       </h2>
 

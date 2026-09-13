@@ -13,7 +13,7 @@ export const metadata = { title: "비밀번호 재설정" };
 export default function ResetPasswordPage() {
   return (
     <div>
-      <h1 className="mb-1 text-[24px] font-bold text-ink">비밀번호 재설정</h1>
+      <h1 className="serif mb-1 text-[26px] font-bold text-gold-lit">비밀번호 재설정</h1>
       <p className="mb-6 text-meta leading-relaxed text-ink-sub">
         가입한 이메일 주소를 입력하시면 재설정 링크를 보내드립니다. 링크를
         누르면 새 비밀번호를 설정할 수 있습니다.

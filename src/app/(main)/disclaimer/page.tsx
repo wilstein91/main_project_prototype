@@ -9,7 +9,7 @@ export const metadata = { title: "투자 유의사항" };
 export default function DisclaimerPage() {
   return (
     <div className="px-4 py-6 lg:px-6 lg:py-0">
-      <h1 className="mb-8 text-[24px] font-bold leading-snug text-ink">
+      <h1 className="serif mb-8 text-[26px] font-bold leading-snug text-gold-lit">
         {DISCLAIMER_PAGE.title}
       </h1>
 

@@ -93,12 +93,12 @@ export function SignUpForm() {
           <legend className="sr-only">약관 동의</legend>
           {AGREEMENTS.map((a) => (
             <div key={a.key} className="flex flex-col gap-1">
-              <label className="flex items-center gap-2.5 text-meta text-ink">
+              <label className="flex min-h-11 items-center gap-2.5 text-meta text-ink">
                 <input
                   type="checkbox"
                   name={a.key}
                   required={a.required}
-                  className="size-4 shrink-0 accent-[var(--color-brand)]"
+                  className="size-5 shrink-0 accent-[var(--color-brand)]"
                 />
                 <span className="flex-1">
                   <span
@@ -114,7 +114,7 @@ export function SignUpForm() {
                   <Link
                     href={a.href}
                     target="_blank"
-                    className="shrink-0 text-[12px] text-ink-sub underline"
+                    className="-mr-2 shrink-0 px-2 text-[12px] text-ink-sub underline hover:text-brand"
                   >
                     보기
                   </Link>

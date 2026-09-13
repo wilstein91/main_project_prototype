@@ -22,7 +22,7 @@ export function LegalDoc({
 }) {
   return (
     <div className="px-4 py-6 lg:px-6 lg:py-0">
-      <h1 className="mb-5 text-[24px] font-bold leading-snug text-ink">
+      <h1 className="serif mb-5 text-[26px] font-bold leading-snug text-gold-lit">
         {title}
       </h1>
 

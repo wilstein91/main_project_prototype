@@ -1,5 +1,4 @@
 import { COMPANY } from "@/config/company";
-import { BladeMark } from "./BladeMark";
 
 /**
  * 워드마크 — DESIGN.md §3.2
@@ -21,6 +20,15 @@ import { BladeMark } from "./BladeMark";
  * 만드는 법은 DESIGN.md §3.4 에 적어 두었다. 이름이 바뀌면 그 절차를
  * 다시 돌려야 한다 — 여기서 글자를 고칠 수는 없다. 그게 이 방식의
  * 유일한 단점이다.
+ *
+ * ## 글자는 세 겹이다 (v1.3)
+ *
+ * 헤더에서 **청룡언월도 그림 위에 얹히므로** 글자만 있으면 묻힌다.
+ * 어두운 외곽선 + 금테 + 크림 채움으로 그려 어떤 그림 위에서도 형태가
+ * 남게 했다 (scripts/build_logo.py 의 COLORS).
+ *
+ * 앞에 붙어 있던 인장은 뺐다 — 워드마크가 이미 이름을 말하는데 그 앞에
+ * 또 다른 표식이 붙으면 무엇이 로고인지 흐려진다.
  */
 export function Wordmark({
   size = "md",
@@ -30,15 +38,18 @@ export function Wordmark({
   /** 가칭 표기를 함께 보일지 */
   showTentative?: boolean;
 }) {
-  const spec = {
-    sm: { mark: 20, word: 17 },
-    md: { mark: 25, word: 21 },
-    lg: { mark: 34, word: 29 },
+  /*
+   * 글자가 주인공이다. 헤더에서는 뒤에 깔린 청룡언월도(56px)보다 작으면
+   * 무기가 먼저 읽히므로, PC 에서 한 단계 키운다.
+   */
+  const cls = {
+    sm: "h-[19px]",
+    md: "h-[26px] lg:h-[38px]",
+    lg: "h-[32px] lg:h-[42px]",
   }[size];
 
   return (
-    <span className="flex min-w-0 items-center gap-2">
-      <BladeMark size={spec.mark} className="shrink-0" />
+    <span className="flex min-w-0 items-center">
       <span className="flex min-w-0 items-center gap-1.5">
         {/*
          * next/image 를 쓰지 않는다. SVG 는 최적화 대상이 아니고,
@@ -49,9 +60,7 @@ export function Wordmark({
         <img
           src="/logo/wordmark.svg"
           alt={COMPANY.serviceName}
-          height={spec.word}
-          style={{ height: spec.word }}
-          className="w-auto max-w-full shrink-0"
+          className={`w-auto max-w-full shrink-0 ${cls}`}
         />
         {showTentative && COMPANY.isTentativeName && (
           <span className="hidden shrink-0 text-[11px] font-medium text-ink-sub sm:inline">

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./fonts.css";
+import "./fonts-myeongjo.css";
 import "./globals.css";
 import { COMPANY, displayServiceName } from "@/config/company";
 import { ALLOW_INDEXING, SITE_URL } from "@/lib/site";
@@ -8,8 +9,11 @@ import { ALLOW_INDEXING, SITE_URL } from "@/lib/site";
  * 서비스명은 항상 config/company.ts 를 경유한다 (F-410).
  * 문자열을 직접 쓰지 않는다 — 상호 확정 시 한 곳만 고치면 되도록.
  *
- * 폰트: Pretendard Variable 을 자체 호스팅한다 (fonts.css).
- * dynamic subset 이라 브라우저가 쓰인 문자 구간만 받는다.
+ * 폰트 두 벌을 자체 호스팅한다. 둘 다 dynamic subset 이라 브라우저가
+ * 화면에 쓰인 문자 구간만 받는다.
+ *   Pretendard   — 본문·목록 (fonts.css)
+ *   나눔명조      — 제목·메뉴·버튼 (fonts-myeongjo.css)
+ * 본문까지 명조로 하면 긴 글에서 눈이 빨리 지친다 (DESIGN.md §5).
  */
 export const metadata: Metadata = {
   title: {

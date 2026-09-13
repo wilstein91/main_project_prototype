@@ -5,7 +5,7 @@ import { Button, ButtonLink } from "@/components/ui/Button";
 export default function GlobalError({ reset }: { reset: () => void }) {
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center gap-4 px-6 text-center">
-      <h1 className="text-title font-bold text-ink">
+      <h1 className="serif text-[24px] font-bold text-ink">
         문제가 발생했습니다
       </h1>
       <p className="max-w-sm text-meta leading-relaxed text-ink-sub">

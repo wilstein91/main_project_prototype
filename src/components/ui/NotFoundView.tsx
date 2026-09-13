@@ -1,5 +1,7 @@
-import { BladeCrest } from "@/components/brand/BladeCrest";
+import { Landscape } from "@/components/brand/Scenery";
+import { artwork } from "@/lib/art";
 import { ButtonLink } from "@/components/ui/Button";
+import { CloudRule } from "@/components/brand/Ornaments";
 
 /**
  * 404 본문 — 두 곳에서 쓴다 (DESIGN.md §6).
@@ -15,16 +17,34 @@ import { ButtonLink } from "@/components/ui/Button";
  * 받는다. 문장은 무엇이 일어났고 어디로 가면 되는지만 말한다.
  */
 export function NotFoundView({ inApp = false }: { inApp?: boolean }) {
+  const art = artwork("notfound");
+
   return (
     <div
       className={`flex flex-col items-center px-6 text-center ${
         inApp ? "py-16" : "min-h-[70vh] justify-center"
       }`}
     >
-      <BladeCrest size={inApp ? 88 : 104} className="opacity-90" />
+      {/*
+       * 그림 한 조각을 창처럼 잘라 보여준다. 아이콘을 크게 키우면 빈약해
+       * 보이지만, 풍경은 잘려도 풍경이다 (DESIGN.md §10.7).
+       */}
+      <div
+        className={`overflow-hidden rounded-[var(--radius-md)] border border-gold-dim ${
+          inApp ? "h-[104px] w-[220px]" : "h-[124px] w-[260px]"
+        }`}
+      >
+        {art ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={art} alt="" aria-hidden className="h-full w-full object-cover" />
+        ) : (
+          <Landscape className="h-full w-full" />
+        )}
+      </div>
 
-      <p className="nums mt-2 text-meta font-bold text-ink-sub">404</p>
-      <h1 className="mt-1 text-title font-bold text-ink">
+      <CloudRule className="mt-3 h-4 w-[200px] opacity-60" />
+      <p className="nums mt-3 text-meta font-bold text-gold">404</p>
+      <h1 className="serif mt-1 text-[24px] font-bold text-ink">
         페이지를 찾을 수 없습니다
       </h1>
       <p className="mt-2 max-w-sm text-meta leading-relaxed text-ink-sub">

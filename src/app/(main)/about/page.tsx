@@ -1,4 +1,6 @@
-import { LogoLockup } from "@/components/brand/LogoLockup";
+import { CloudRule, CornerMarks } from "@/components/brand/Ornaments";
+import { Landscape } from "@/components/brand/Scenery";
+import { artwork } from "@/lib/art";
 import { ButtonLink } from "@/components/ui/Button";
 import { COMPANY, displayServiceName } from "@/config/company";
 
@@ -30,6 +32,8 @@ const PRINCIPLES = [
 ];
 
 export default function AboutPage() {
+  const hero = artwork("hero");
+
   return (
     <div className="px-4 py-6 lg:px-6 lg:py-0">
       {/*
@@ -37,13 +41,39 @@ export default function AboutPage() {
        * 이라는 이름의 출처를 설명하는데, 그 설명과 마크가 같은 자리에
        * 있어야 로고가 장식이 아니라 뜻으로 읽힌다 (DESIGN.md §3.3).
        */}
-      <header className="mb-8 rounded-[var(--radius-md)] bg-brand-soft px-6 py-6 lg:px-8 lg:py-8">
-        <h1>
-          <LogoLockup className="w-[300px] max-w-full sm:w-[400px] lg:w-[470px]" />
-        </h1>
-        <p className="mt-3 text-list leading-relaxed text-ink-sub">
-          {COMPANY.tagline}
-        </p>
+      <header
+        className="relative mb-8 overflow-hidden rounded-[var(--radius-md)] border border-gold-dim
+          bg-[#0b1c1f] px-6 py-9 lg:px-9 lg:py-12"
+      >
+        {hero ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={hero}
+            alt=""
+            aria-hidden
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <Landscape className="pointer-events-none absolute inset-0 h-full w-full" />
+        )}
+        <div
+        className="pointer-events-none absolute inset-0
+          bg-[linear-gradient(100deg,rgba(6,16,18,0.86)_0%,rgba(6,16,18,0.56)_28%,rgba(6,16,18,0.14)_60%,transparent_100%),linear-gradient(0deg,rgba(6,16,18,0.8)_0%,rgba(6,16,18,0.35)_30%,transparent_62%)]"
+      />
+        <CornerMarks className="absolute inset-0" />
+        <div className="relative">
+          <h1>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo/wordmark.svg"
+              alt={COMPANY.serviceName}
+              className="h-[40px] w-auto drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] sm:h-[52px] lg:h-[60px]"
+            />
+          </h1>
+          <p className="mt-3 text-list leading-relaxed text-ink-sub">
+            {COMPANY.tagline}
+          </p>
+        </div>
       </header>
 
       <section className="mb-8 flex flex-col gap-4 text-body leading-[1.75] text-ink">
@@ -61,15 +91,17 @@ export default function AboutPage() {
       </section>
 
       <section className="mb-8">
-        <h2 className="mb-4 text-title font-bold text-ink">운영 원칙</h2>
+        <h2 className="serif title-mark mb-4 text-title font-bold text-gold-lit">운영 원칙</h2>
         <ul className="flex flex-col gap-3">
           {PRINCIPLES.map((p, i) => (
             <li
               key={p.title}
-              className="rounded-[var(--radius-md)] bg-surface px-4 py-4"
+              className="rounded-[var(--radius-md)] border border-line bg-surface px-4 py-4"
             >
               <p className="mb-1 flex items-baseline gap-2 text-list font-bold text-ink">
-                <span className="text-brand">{i + 1}</span>
+                <span className="text-gold" aria-hidden>
+                  {i + 1}
+                </span>
                 {p.title}
               </p>
               <p className="text-meta leading-relaxed text-ink-sub">{p.body}</p>
@@ -78,8 +110,8 @@ export default function AboutPage() {
         </ul>
       </section>
 
-      <section className="mb-8 rounded-[var(--radius-md)] border border-line px-4 py-4">
-        <h2 className="mb-2 text-list font-bold text-ink">
+      <section className="mb-8 rounded-[var(--radius-md)] border border-gold-dim bg-surface/50 px-4 py-4">
+        <h2 className="serif mb-2 text-list font-bold text-gold-lit">
           현재 운영 상태
         </h2>
         <p className="text-meta leading-relaxed text-ink-sub">
@@ -89,6 +121,8 @@ export default function AboutPage() {
           표시됩니다. 커뮤니티 서비스는 그와 무관하게 정상 운영됩니다.
         </p>
       </section>
+
+      <CloudRule className="mx-auto mb-8 h-5 w-[240px] opacity-70" />
 
       <div className="flex flex-wrap gap-2">
         <ButtonLink href="/">커뮤니티 둘러보기</ButtonLink>

@@ -36,7 +36,7 @@ export default async function AdminPage() {
   return (
     <div className="px-4 py-6 lg:px-6 lg:py-0">
       <div className="mb-6 flex items-center gap-2">
-        <h1 className="text-title font-bold text-ink">관리자</h1>
+        <h1 className="serif title-mark text-title font-bold text-gold-lit">관리자</h1>
         <Badge tone="brand">admin</Badge>
       </div>
 
