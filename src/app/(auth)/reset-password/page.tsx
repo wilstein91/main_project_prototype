@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Scene } from "@/components/brand/Scene";
 import { ResetRequestForm } from "@/components/auth/ResetRequestForm";
 import { PendingNotice } from "@/components/ui/PendingNotice";
 import { isSeedMode } from "@/lib/data/queries";
@@ -13,6 +14,8 @@ export const metadata = { title: "비밀번호 재설정" };
 export default function ResetPasswordPage() {
   return (
     <div>
+      <Scene name="auth-reset" />
+
       <h1 className="serif mb-1 text-[26px] font-bold text-gold-lit">비밀번호 재설정</h1>
       <p className="mb-6 text-meta leading-relaxed text-ink-sub">
         가입한 이메일 주소를 입력하시면 재설정 링크를 보내드립니다. 링크를

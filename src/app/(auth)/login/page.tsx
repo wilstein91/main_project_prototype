@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Scene } from "@/components/brand/Scene";
 import { redirect } from "next/navigation";
 import { SignInForm } from "@/components/auth/SignInForm";
 import { PendingNotice } from "@/components/ui/PendingNotice";
@@ -51,6 +52,8 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
 
   return (
     <div>
+      <Scene name="auth-login" />
+
       <h1 className="serif mb-1 text-[26px] font-bold text-gold-lit">로그인</h1>
       <p className="mb-6 text-meta text-ink-sub">
         글과 댓글을 쓰려면 로그인이 필요합니다.

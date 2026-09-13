@@ -254,16 +254,19 @@ textarea:focus-visible,
     0 0 10px rgba(75, 184, 170, 0.18);
 }
 
-/* 주요 행동 — 청록 에나멜을 금테에 물린다 */
+/* 주요 행동 — 청록 에나멜을 금테에 물린다.
+   색은 **그림 판(plate-teal)에 맞춰** 어둡게 잡았다. 그림이 기본이고
+   이건 폴백이므로, 둘의 밝기가 다르면 같은 글자색이 한쪽에서 안 읽힌다.
+   실제로 밝은 청록에 먹색 글자를 쓰다가 그림 판에서 2.56:1 로 떨어졌다. */
 @utility plaque-brand {
   background:
-    linear-gradient(180deg, #6fd3c4 0%, #4bb8aa 45%, #2c8377 100%) padding-box,
+    linear-gradient(180deg, #4a8a85 0%, #366462 45%, #244442 100%) padding-box,
     linear-gradient(180deg, #f7e7bd 0%, #c8922a 45%, #7d5610 100%) border-box;
   border: 2px solid transparent;
   border-radius: 10px;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    inset 0 -2px 5px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.35),
     0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
@@ -304,6 +307,33 @@ textarea:focus-visible,
     inset 0 -2px 5px rgba(20, 60, 55, 0.4),
     0 0 12px rgba(75, 184, 170, 0.25);
   color: #0d2320;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   그림 버튼 판 — DESIGN.md §10.10
+
+   판 그림 한 장을 **9조각으로 잘라** 모서리는 고정하고 가운데만 늘린다
+   (`border-image`). 그래서 판 한 장이 모든 버튼 폭에 대응한다 — 글자가
+   길어져도 모서리 장식이 찌그러지지 않는다.
+
+   `plaque` 계열 위에 겹쳐 쓴다. 그림 파일이 없으면 `border-image` 가
+   무시되고 아래의 CSS 명판이 그대로 보인다 — 폴백이 공짜로 생긴다.
+
+   ⚠️ `border-image` 를 쓰면 `border-radius` 가 무시된다. 둥근 모서리는
+   판 그림 자체가 갖고 있으므로 문제되지 않는다.
+   ───────────────────────────────────────────────────────────── */
+@utility plate-img-teal {
+  border-image: url("/images/plate-teal-316x88.webp") 13 fill / 7px stretch;
+  border-style: solid;
+  border-width: 7px;
+  box-shadow: none;
+}
+
+@utility plate-img-bronze {
+  border-image: url("/images/plate-bronze-282x80.webp") 13 fill / 7px stretch;
+  border-style: solid;
+  border-width: 7px;
+  box-shadow: none;
 }
 
 /* 명조 — 제목·메뉴·버튼 */

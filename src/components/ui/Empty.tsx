@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Seal } from "@/components/brand/Scenery";
+import { artwork } from "@/lib/art";
 import { CloudRule } from "@/components/brand/Ornaments";
 
 /**
@@ -10,6 +11,8 @@ import { CloudRule } from "@/components/brand/Ornaments";
  * 브랜드가 말을 걸어도 방해가 되지 않는 몇 안 되는 자리다
  * (DESIGN.md §2). 옅게 깔아 문장보다 앞서지 않게 한다.
  */
+const ART = "empty";
+
 export function Empty({
   title,
   description,
@@ -21,7 +24,20 @@ export function Empty({
 }) {
   return (
     <div className="flex flex-col items-center gap-3 px-6 py-14 text-center">
-      <Seal size={46} className="opacity-70" />
+      {(() => {
+        const art = artwork(ART);
+        return art ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={art}
+            alt=""
+            aria-hidden
+            className="mb-1 h-28 w-full max-w-[380px] rounded-[var(--radius-md)] border border-gold-dim object-cover"
+          />
+        ) : (
+          <Seal size={46} className="opacity-70" />
+        );
+      })()}
       <CloudRule className="h-4 w-[200px] opacity-60" />
       <p className="text-list font-semibold text-ink">{title}</p>
       {description && (

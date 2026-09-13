@@ -5,6 +5,21 @@ import { Button, ButtonLink } from "@/components/ui/Button";
 export default function GlobalError({ reset }: { reset: () => void }) {
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center gap-4 px-6 text-center">
+      {/*
+        * 오류 화면은 클라이언트 컴포넌트라 파일 시스템을 볼 수 없다.
+        * 그림 경로를 그대로 쓰고, 없으면 브라우저가 조용히 건너뛰도록
+        * onError 로 숨긴다.
+        */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/error.webp"
+        alt=""
+        aria-hidden
+        onError={(e) => {
+          e.currentTarget.style.display = "none";
+        }}
+        className="mb-2 h-32 w-full max-w-[420px] rounded-[var(--radius-md)] border border-gold-dim object-cover"
+      />
       <h1 className="serif text-[24px] font-bold text-ink">
         문제가 발생했습니다
       </h1>

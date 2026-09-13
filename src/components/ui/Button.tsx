@@ -30,8 +30,15 @@ const base =
  */
 const variants: Record<Variant, string> = {
   /* 청록 에나멜을 금테에 물린 판. 글자는 판보다 어두워야 읽힌다 */
-  primary: "plaque-brand font-bold text-[#08201d] hover:brightness-110",
-  secondary: "plaque font-bold text-gold-lit hover:brightness-125",
+  /*
+   * plaque* 는 CSS 로 그린 판이고, plate-img-* 는 그 위에 얹는 **그림 판**
+   * 이다. 그림 파일이 없으면 border-image 가 무시되어 CSS 판이 그대로
+   * 보인다 (DESIGN.md §10.10).
+   */
+  primary:
+    "plaque-brand plate-img-teal font-bold text-[#f7efdd] hover:brightness-115",
+  secondary:
+    "plaque plate-img-bronze font-bold text-gold-lit hover:brightness-125",
   /* 판을 쓰지 않는 자리 — 취소처럼 물러나는 행동 */
   ghost: "rounded-[var(--radius-sm)] text-ink-sub hover:bg-surface-lit hover:text-ink",
   danger:

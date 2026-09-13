@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Scene } from "@/components/brand/Scene";
 import { redirect } from "next/navigation";
 import { SignUpForm } from "@/components/auth/SignUpForm";
 import { PendingNotice } from "@/components/ui/PendingNotice";
@@ -14,6 +15,8 @@ export default async function SignupPage() {
 
   return (
     <div>
+      <Scene name="auth-signup" />
+
       <h1 className="serif mb-1 text-[26px] font-bold text-gold-lit">회원가입</h1>
       <p className="mb-6 text-meta text-ink-sub">
         이메일 인증 후 이용할 수 있습니다.
